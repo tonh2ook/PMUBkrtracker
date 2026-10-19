@@ -1,0 +1,1255 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ติดตามผลผลิตโครงการ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EEF1F5; --surface:#FFFFFF; --sunk:#F6F8FA; --ink:#17202E; --ink2:#465366; --muted:#6B778A;
+  --line:#D9DFE7; --line2:#E8ECF1;
+  --primary:#1D4ED8; --primary-ink:#FFFFFF; --primary-soft:#E4ECFF;
+  --ok:#14804A; --ok-soft:#DDF3E6; --pend:#C77C02; --pend-soft:#FCEFD6; --risk:#C2410C; --risk-soft:#FDE5D8;
+  --late:#B42318; --late-soft:#FCE2E0; --empty:#C9D1DC;
+  --side:#0F2A5C; --side-ink:#DCE5F7; --side-muted:#8EA3C8;
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+  --r:10px;
+  --ui:'Anuphan',system-ui,sans-serif; --doc:'Sarabun','Anuphan',sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E131B; --surface:#161D28; --sunk:#111821; --ink:#E6EBF2; --ink2:#B4BFCE; --muted:#8693A6;
+    --line:#2A3442; --line2:#222B37; --primary:#6E9BFF; --primary-ink:#0B1220; --primary-soft:#1B2A4A;
+    --ok:#3FC07D; --ok-soft:#173527; --pend:#F0A93A; --pend-soft:#3A2C12; --risk:#F28147; --risk-soft:#3B2216;
+    --late:#F26B5F; --late-soft:#3C1A18; --empty:#3A4656; --side:#0A1730; --side-ink:#D5DEEF; --side-muted:#7F92B5;
+    --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E131B; --surface:#161D28; --sunk:#111821; --ink:#E6EBF2; --ink2:#B4BFCE; --muted:#8693A6;
+  --line:#2A3442; --line2:#222B37; --primary:#6E9BFF; --primary-ink:#0B1220; --primary-soft:#1B2A4A;
+  --ok:#3FC07D; --ok-soft:#173527; --pend:#F0A93A; --pend-soft:#3A2C12; --risk:#F28147; --risk-soft:#3B2216;
+  --late:#F26B5F; --late-soft:#3C1A18; --empty:#3A4656; --side:#0A1730; --side-ink:#D5DEEF; --side-muted:#7F92B5;
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--ui);font-size:15px;line-height:1.55;background:var(--paper);color:var(--ink);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:4px}
+a{color:var(--primary)}
+.app{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+
+/* sidebar */
+.side{background:var(--side);color:var(--side-ink);padding:20px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:22px}
+.brand{display:flex;gap:10px;align-items:center;padding:0 6px}
+.mark{width:40px;height:40px;border-radius:9px;background:#fff;color:var(--side);display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.brand b{display:block;font-size:15px;line-height:1.25}
+.brand span{font-size:12px;color:var(--side-muted)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{all:unset;cursor:pointer;display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:8px;font-size:14.5px;color:var(--side-ink)}
+.nav button svg{width:18px;height:18px;flex:none;opacity:.8}
+.nav button:hover{background:rgba(255,255,255,.07)}
+.nav button[aria-current="page"]{background:rgba(255,255,255,.14);font-weight:600}
+.nav button:focus-visible{outline:2px solid #fff}
+.nav .count{margin-left:auto;background:var(--pend);color:#1b1300;font-size:11.5px;font-weight:700;border-radius:20px;padding:0 7px;line-height:19px}
+.side-foot{margin-top:auto;font-size:12px;color:var(--side-muted);padding:0 6px;display:flex;flex-direction:column;gap:8px}
+.side-foot button{all:unset;cursor:pointer;color:var(--side-ink);font-size:12.5px;text-decoration:underline;text-underline-offset:3px}
+.ver{color:var(--side-ink);font-weight:600}
+
+main{padding:28px 32px 80px;min-width:0}
+.wrap{max-width:1360px;margin:0 auto}
+.demo-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--pend-soft);border:1px solid color-mix(in srgb,var(--pend) 40%,transparent);color:var(--ink);padding:9px 14px;border-radius:var(--r);margin-bottom:20px;font-size:14px}
+.demo-bar b{color:var(--pend)}
+.demo-bar button{margin-left:auto}
+
+/* type */
+h1{font-size:26px;line-height:1.25;margin:0;font-weight:700;letter-spacing:-.01em}
+h2{font-size:18px;margin:0;font-weight:600}
+h3{font-size:15.5px;margin:0;font-weight:600}
+.lede{color:var(--ink2);margin:6px 0 0;max-width:72ch}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.doc{font-family:var(--doc)}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+
+/* buttons & inputs */
+.btn{cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.btn:hover{border-color:var(--ink2)}
+.btn.pri{background:var(--primary);border-color:var(--primary);color:var(--primary-ink)}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--primary);padding:6px 8px}
+.btn.ghost:hover{background:var(--primary-soft)}
+.btn.danger{color:var(--late)}
+.btn.sm{padding:5px 10px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn svg{width:16px;height:16px}
+input[type=text],input[type=search],input[type=number],input[type=date],input[type=url],select,textarea{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 10px;font-size:14.5px;width:100%;min-width:0}
+textarea{resize:vertical;min-height:40px;line-height:1.45}
+input:focus,select:focus,textarea:focus{outline:2px solid color-mix(in srgb,var(--primary) 55%,transparent);outline-offset:0;border-color:var(--primary)}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:13.5px;color:var(--ink2);font-weight:500}
+.hint{font-size:12.5px;color:var(--muted);font-weight:400}
+
+/* panels */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.panel-h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px 0;flex-wrap:wrap}
+.panel-b{padding:14px 18px 18px}
+
+/* overview */
+.status-line{font-family:var(--doc);font-size:21px;line-height:1.5;margin:0 0 22px;max-width:62ch;color:var(--ink2)}
+.status-line b{color:var(--ink);font-weight:600}
+.status-line .k-ok{color:var(--ok)} .status-line .k-pend{color:var(--pend)} .status-line .k-risk{color:var(--risk)}
+.ov-top{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:18px;margin-bottom:18px}
+.osum{display:flex;flex-direction:column}
+.osum-row{display:grid;grid-template-columns:22px minmax(0,1fr) minmax(90px,1.1fr) 74px;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--line2);font-size:14px;cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;width:100%}
+.osum-row:first-child{border-top:0}
+.osum-row:hover .nm{color:var(--primary)}
+.osum-row .no{color:var(--muted);font-weight:600;font-size:13px;text-align:right}
+.osum-row .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.osum-row .ct{text-align:right;font-size:13.5px;color:var(--ink2)}
+.osum-row .ct b{color:var(--ink)}
+.osum-row.zero{cursor:default;color:var(--muted)}
+.sbar{height:10px;border-radius:5px;background:var(--line2);display:flex;overflow:hidden}
+.sbar i{display:block;height:100%}
+.sbar .a{background:var(--ok)}
+.sbar .p{background:repeating-linear-gradient(135deg,var(--pend) 0 3px,color-mix(in srgb,var(--pend) 45%,transparent) 3px 6px)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);align-items:center}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.kr-tag{display:inline-block;font-size:11.5px;font-weight:600;color:var(--primary);background:var(--primary-soft);border-radius:5px;padding:0 6px;line-height:18px;vertical-align:1px;margin-left:6px;white-space:nowrap}
+
+.watch{display:flex;flex-direction:column}
+.watch-row{all:unset;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:10px 0;border-top:1px solid var(--line2)}
+.watch-row:first-child{border-top:0}
+.watch-row:hover .t{color:var(--primary)}
+.watch-row .t{font-family:var(--doc);font-size:14.5px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.watch-row .m{font-size:12.5px;color:var(--muted);grid-column:1}
+.watch-row .chip{grid-row:1/3;grid-column:2;align-self:center}
+.kr-box{margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
+.kr-num{display:flex;align-items:baseline;gap:8px;margin:6px 0}
+.kr-num b{font-size:26px;line-height:1}
+.empty-note{color:var(--muted);font-size:14px;padding:6px 0}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;border-radius:20px;padding:1px 9px;line-height:20px;white-space:nowrap}
+.chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.c-done{color:var(--ok);background:var(--ok-soft)}
+.c-track{color:var(--primary);background:var(--primary-soft)}
+.c-risk{color:var(--risk);background:var(--risk-soft)}
+.c-late{color:var(--late);background:var(--late-soft)}
+.c-nodate{color:var(--muted);background:var(--line2)}
+.c-pend{color:var(--pend);background:var(--pend-soft)}
+.c-ok{color:var(--ok);background:var(--ok-soft)}
+
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--line)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--sunk)}
+.seg button{all:unset;cursor:pointer;padding:6px 12px;font-size:13.5px;color:var(--ink2)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--primary)}
+.seg button:focus-visible{outline:2px solid var(--primary);outline-offset:-2px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:4px 11px;font-size:13px;color:var(--ink2)}
+.chips button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.toolbar .grow{flex:1}
+.toolbar input[type=search]{max-width:240px}
+.toolbar select{width:auto}
+
+/* matrix */
+.scroller{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.mx{border-collapse:separate;border-spacing:0;width:100%;min-width:1060px}
+.mx th,.mx td{border-bottom:1px solid var(--line2);padding:9px 6px;vertical-align:middle}
+.mx thead th{font-size:12.5px;font-weight:600;color:var(--ink2);text-align:center;vertical-align:bottom;background:var(--surface);position:sticky;top:0;z-index:2;line-height:1.3;border-bottom:1px solid var(--line)}
+.mx thead th .n{display:block;color:var(--muted);font-size:12px;font-weight:600}
+.mx .pc{position:sticky;left:0;background:var(--surface);z-index:1;text-align:left;width:250px;min-width:250px;max-width:250px;box-shadow:1px 0 0 var(--line2)}
+.mx thead .pc{z-index:3}
+.mx tr.grp td{background:var(--sunk);font-size:13px;font-weight:600;color:var(--ink2);padding:6px 12px;position:sticky;left:0}
+.mx tr.grp td span{font-weight:400;color:var(--muted);margin-left:6px}
+.mx tbody tr.pr{cursor:pointer}
+.mx tbody tr.pr:hover td{background:var(--sunk)}
+.mx tbody tr.pr:hover td.pc{background:var(--sunk)}
+.pc .ct{font-size:12px;color:var(--muted);display:flex;gap:8px}
+.pc .tt{font-family:var(--doc);font-size:14px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:1px 0}
+.pc .pi{font-size:12px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mx td.cell{text-align:center;min-width:70px}
+.mx td.cell button{all:unset;cursor:pointer;display:inline-flex;flex-direction:column;align-items:center;gap:3px;padding:4px;border-radius:6px}
+.mx td.cell button:hover{background:var(--primary-soft)}
+.mx td.cell button:focus-visible{outline:2px solid var(--primary)}
+.mx td.end{min-width:140px}
+.mx td.cell.hi,.mx thead th.hi{background:color-mix(in srgb,var(--primary) 9%,var(--surface))}
+.mx thead th.hi{color:var(--primary)}
+.osum-row.on .nm{color:var(--primary);font-weight:600}
+.nil{color:var(--empty);font-size:15px}
+.pips{display:grid;grid-template-columns:repeat(5,9px);gap:3px;justify-content:center}
+.pips.n1{grid-template-columns:9px}.pips.n2{grid-template-columns:repeat(2,9px)}.pips.n3{grid-template-columns:repeat(3,9px)}.pips.n4{grid-template-columns:repeat(4,9px)}
+.pip{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--empty);background:transparent}
+.pip.a{background:var(--ok);border-color:var(--ok)}
+.pip.p{border-color:var(--pend);background:var(--pend-soft)}
+.over{font-size:11px;font-weight:700;color:var(--ok)}
+.bigc{font-size:13px;color:var(--ink2);line-height:1.1}
+.bigc b{color:var(--ink);font-size:14px}
+.mini{width:56px;height:5px;border-radius:3px;background:var(--line2);display:flex;overflow:hidden}
+.mini i{display:block;height:100%}
+.mini .a{background:var(--ok)} .mini .p{background:var(--pend)}
+.endcell{display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+.duo{display:grid;grid-template-columns:34px 70px 32px;gap:2px 6px;align-items:center;font-size:11.5px;color:var(--muted)}
+.duo .bar{height:5px;border-radius:3px;background:var(--line2);overflow:hidden}
+.duo .bar i{display:block;height:100%}
+.duo .t i{background:var(--ink2)} .duo .o i{background:var(--ok)}
+.duo .v{text-align:right;color:var(--ink2)}
+
+/* project view */
+.picker{display:flex;gap:8px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+.picker select{flex:1;min-width:220px;max-width:640px}
+.proj-head{padding:22px 24px}
+.proj-head .tags{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px;font-size:13px;color:var(--muted)}
+.prog-tag{font-weight:600;color:var(--ink);background:var(--sunk);border:1px solid var(--line);border-radius:6px;padding:1px 8px}
+.proj-head h1{font-family:var(--doc);font-size:24px;font-weight:600;line-height:1.4;max-width:60ch}
+.proj-head .en{color:var(--ink2);margin:6px 0 0;font-size:14.5px;max-width:80ch}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 24px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line2)}
+.facts dt{font-size:12.5px;color:var(--muted)}
+.facts dd{margin:2px 0 0;font-size:14.5px}
+.timebox{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;margin-top:16px;padding:14px 16px;border-radius:8px;background:var(--sunk);border:1px solid var(--line2)}
+.tl{display:grid;grid-template-columns:120px minmax(0,1fr) 46px;gap:6px 12px;align-items:center;font-size:13.5px}
+.tl .bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.tl .bar i{display:block;height:100%}
+.tl .t i{background:var(--ink2)} .tl .o i{background:var(--ok)}
+.tl .v{text-align:right;font-weight:600}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:22px 0 0}
+.tabs button{all:unset;cursor:pointer;padding:10px 14px;font-weight:500;color:var(--ink2);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--ink);border-color:var(--primary);font-weight:600}
+.tabs button:focus-visible{outline:2px solid var(--primary)}
+.tabs .sp{flex:1}
+.items{display:flex;flex-direction:column}
+.item{border-bottom:1px solid var(--line2);padding:14px 4px}
+.item-h{display:grid;grid-template-columns:28px minmax(0,1fr) 140px 120px auto;gap:12px;align-items:center}
+.item-h .no{font-weight:700;color:var(--muted);text-align:right}
+.item-h .nm{font-weight:500}
+.item-h .nm small{display:block;color:var(--muted);font-weight:400;font-size:12.5px}
+.item.zero .nm{color:var(--muted)}
+.ibar{display:flex;align-items:center;gap:8px}
+.ibar .sbar{flex:1}
+.icount{font-size:13.5px;color:var(--ink2);text-align:right}
+.icount b{font-size:16px;color:var(--ink)}
+.subs{margin:10px 0 0 40px;display:grid;gap:6px}
+.sub{display:grid;grid-template-columns:minmax(0,1fr) 140px 120px;gap:12px;align-items:center;font-size:13.5px;color:var(--ink2);padding-right:120px}
+.evs{list-style:none;margin:10px 0 0 40px;padding:0;display:flex;flex-direction:column;gap:6px}
+.ev{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;padding:8px 10px;border-radius:8px;background:var(--sunk);font-size:13.5px}
+.ev .tt{font-weight:500;color:var(--ink)}
+.ev .meta{color:var(--muted);font-size:12.5px;margin-top:1px}
+.ev .acts{display:flex;gap:2px}
+.ev.pend{background:var(--pend-soft)}
+.more{margin:6px 0 0 36px}
+
+/* intake */
+.intake-meta{display:grid;grid-template-columns:2fr 1.3fr 1fr 1fr;gap:14px;padding:18px}
+.irow{display:grid;grid-template-columns:28px minmax(0,1.2fr) 70px 80px 190px minmax(0,1.5fr);gap:12px;align-items:start;padding:12px 18px;border-top:1px solid var(--line2)}
+.irow.head{font-size:12.5px;color:var(--muted);font-weight:600;padding-top:10px;padding-bottom:10px;background:var(--sunk);align-items:end}
+.irow .no{font-weight:700;color:var(--muted);text-align:right;padding-top:8px}
+.irow .nm{padding-top:8px;font-size:14px}
+.irow .num{padding-top:8px;text-align:right;color:var(--ink2)}
+.irow.zero .nm,.irow.zero .num{color:var(--muted)}
+.irow input[type=number]{text-align:right}
+.irow .o1{display:grid;gap:6px}
+.irow .o1 label{display:grid;grid-template-columns:minmax(0,1fr) 72px;gap:6px;align-items:center;font-size:12.5px;color:var(--ink2)}
+.intake-foot{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:14px 18px;border-top:1px solid var(--line);flex-wrap:wrap}
+
+/* register */
+table.rg{border-collapse:collapse;width:100%;min-width:960px;font-size:14px}
+.rg th{text-align:left;font-size:12.5px;color:var(--muted);font-weight:600;padding:9px 10px;border-bottom:1px solid var(--line);background:var(--sunk);position:sticky;top:0}
+.rg td{padding:10px;border-bottom:1px solid var(--line2);vertical-align:top}
+.rg td.q{text-align:right}
+.rg .tt{font-weight:500}
+.rg .sub2{font-size:12.5px;color:var(--muted)}
+.rg tr.sel td{background:var(--primary-soft)}
+.bulk{display:flex;gap:10px;align-items:center;padding:10px 18px;background:var(--primary-soft);font-size:14px}
+
+/* settings */
+.set-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.set-grid .panel-b p{margin:0 0 12px;color:var(--ink2);font-size:14px}
+.row-btns{display:flex;gap:8px;flex-wrap:wrap}
+.krmap{display:grid;grid-template-columns:28px minmax(0,1fr) 120px minmax(0,1.4fr);gap:8px 12px;align-items:center;font-size:13.5px}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(10,16,28,.48);display:none;align-items:flex-start;justify-content:center;padding:5vh 16px;z-index:50;overflow-y:auto}
+.modal.open{display:flex}
+.dialog{background:var(--surface);border-radius:12px;width:min(640px,100%);box-shadow:0 20px 50px rgba(0,0,0,.25);animation:pop .16s ease-out}
+@keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+.dialog-h{padding:18px 22px 4px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.dialog-h p{margin:4px 0 0;color:var(--muted);font-size:13.5px}
+.dialog-b{padding:14px 22px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.dialog-b .full{grid-column:1/-1}
+.dialog-f{padding:14px 22px 18px;display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line2)}
+.dialog-f .r{display:flex;gap:8px;margin-left:auto}
+.radio{display:flex;gap:8px;flex-wrap:wrap}
+.radio label{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px;color:var(--ink)}
+.radio input{accent-color:var(--primary)}
+.radio label:has(input:checked){border-color:var(--primary);background:var(--primary-soft)}
+.x{all:unset;cursor:pointer;width:32px;height:32px;display:grid;place-items:center;border-radius:8px;color:var(--muted);font-size:20px}
+.x:hover{background:var(--sunk)}
+.tg-grid{display:grid;grid-template-columns:28px minmax(0,1fr) 90px;gap:8px 12px;align-items:center;font-size:14px}
+.tg-grid .no{color:var(--muted);font-weight:700;text-align:right}
+.tg-grid .ind{padding-left:16px;font-size:13px;color:var(--ink2)}
+
+.yearbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 20px}
+.yearbar .yl{font-size:13.5px;color:var(--ink2);font-weight:600}
+.yearbar .chips button{font-size:14px;padding:5px 13px}
+.yearbar .chips button.nodata{color:var(--muted);border-style:dashed}
+.yearbar .chips button.nodata[aria-pressed="true"]{color:var(--surface)}
+.yearbar .cnt{font-size:12px;opacity:.7;margin-left:2px}
+.yearbar .sp{flex:1}
+.empty-year{padding:36px 28px;text-align:left}
+.empty-year h2{margin-bottom:6px}
+.empty-year p{color:var(--ink2);max-width:62ch;margin:0 0 16px}
+.imp-t{width:100%;border-collapse:collapse;font-size:14px}
+.imp-t th{text-align:left;font-size:12.5px;color:var(--muted);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
+.imp-t td{padding:8px;border-bottom:1px solid var(--line2);vertical-align:top}
+.imp-t select{width:auto;padding:5px 8px}
+.warn{margin:0;padding-left:18px;font-size:13px;color:var(--risk)}
+.yr-list{display:grid;grid-template-columns:80px minmax(0,1fr) auto;gap:8px 14px;align-items:center;font-size:14px;margin-bottom:14px}
+.yr-list b{font-size:15px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--surface);padding:10px 18px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:.2s;z-index:60;max-width:calc(100% - 32px)}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.tabbar{display:none}
+.mtop{display:none}
+
+@media (max-width:1100px){
+  .ov-top{grid-template-columns:1fr}
+  .facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .set-grid{grid-template-columns:1fr}
+}
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .side{display:none}
+  main{padding:0 16px 96px}
+  .mtop{display:flex;align-items:center;gap:10px;padding:12px 0;margin-bottom:6px}
+  .mtop .mark{width:34px;height:34px;background:var(--side);color:#fff;font-size:11.5px}
+  .mtop b{font-size:15px}
+  .mtop .sp{flex:1}
+  .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);z-index:40;padding-bottom:env(safe-area-inset-bottom)}
+  .tabbar button{all:unset;flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px;font-size:11px;color:var(--muted);cursor:pointer;position:relative}
+  .tabbar button svg{width:21px;height:21px}
+  .tabbar button[aria-current="page"]{color:var(--primary);font-weight:600}
+  .tabbar .count{position:absolute;top:4px;left:calc(50% + 6px);background:var(--pend);color:#1b1300;font-size:10px;font-weight:700;border-radius:10px;padding:0 5px;line-height:15px}
+  h1{font-size:22px}
+  .status-line{font-size:18px}
+  .proj-head{padding:18px 16px}
+  .proj-head h1{font-size:20px}
+  .mx .pc{width:200px;min-width:200px;max-width:200px}
+  .item-h{grid-template-columns:24px minmax(0,1fr) auto;row-gap:8px}
+  .item-h .ibar{grid-column:2/4;grid-row:2}
+  .item-h .icount{grid-column:3;grid-row:1}
+  .item-h .add{grid-column:2/4;grid-row:3;justify-self:start}
+  .sub{grid-template-columns:minmax(0,1fr) 90px;padding-right:0}
+  .sub .ibar{display:none}
+  .subs,.evs{margin-left:0}
+  .more{margin-left:0}
+  .ev{grid-template-columns:auto minmax(0,1fr)}
+  .ev .acts{grid-column:2}
+  .tabs{flex-wrap:wrap}
+  .tabs .sp{flex-basis:100%;height:0}
+  .tabs .btn.ghost{margin:4px 0}
+  .intake-meta{grid-template-columns:1fr;padding:16px}
+  .irow{grid-template-columns:24px minmax(0,1fr) 70px;padding:12px 16px}
+  .irow.head{display:none}
+  .irow .num{grid-column:3;grid-row:1}
+  .irow .num.d{display:none}
+  .irow .qty,.irow .det{grid-column:2/4}
+  .irow .qty::before{content:attr(data-l);display:block;font-size:12px;color:var(--muted);margin-bottom:3px}
+  .dialog-b{grid-template-columns:1fr}
+  .timebox{grid-template-columns:1fr}
+  .tl{grid-template-columns:96px minmax(0,1fr) 42px}
+  .toolbar{padding:12px 14px}
+  .toolbar input[type=search]{max-width:none;flex:1 1 160px}
+  .panel-h{padding:14px 14px 0}.panel-b{padding:12px 14px 14px}
+  .krmap{grid-template-columns:24px minmax(0,1fr)}
+  .krmap input{grid-column:2}
+  .yearbar{gap:8px}
+  .yearbar .yl{width:100%}
+  .imp-t{font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" aria-label="เมนูหลัก">
+    <div class="brand"><div class="mark">บพค.</div><div><b>ติดตามผลผลิตโครงการ</b><span>Global Partnership</span></div></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <div id="savedAt">ยังไม่มีการบันทึก</div>
+      <button type="button" id="themeBtn">สลับโหมดสว่าง/มืด</button>
+      <div><span class="ver" id="ver"></span> ต้นแบบหน้าจอ สำหรับ D3-One</div>
+    </div>
+  </aside>
+  <main>
+    <div class="wrap">
+      <div class="mtop"><div class="mark">บพค.</div><b>ติดตามผลผลิตโครงการ</b><span class="sp"></span><button class="btn sm" type="button" id="themeBtnM" aria-label="สลับโหมดสว่าง/มืด">◐</button></div>
+      <div id="demoBar"></div>
+      <div id="view"></div>
+    </div>
+  </main>
+</div>
+<nav class="tabbar" id="tabbar" aria-label="เมนูหลัก"></nav>
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="dialog" id="dialog"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<input type="file" id="impx" accept=".xlsx,.xlsm,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
+
+<script>
+'use strict';
+const SEED = {"fy": 2568, "sheet": "Output_68", "projects": [{"seq": 1, "contract": "B49G680107", "th": "โครงการการพัฒนาแพลตฟอร์มการจำลองเชิงคำนวณสำหรับการออกแบบและประยุกต์ใช้วัสดุรอยต่อในเซลล์แสงอาทิตย์อินทรีย์เพื่อเชื่อมโยงงานวิจัยด้านไฮโดรเจนสีเขียวระหว่างประเทศในภูมิภาคเอเชียตะวันออก", "en": "Interface Materials Informatics – A platform for semiconductor interface design and optimization in organic solar cells", "pi": "ผศ. ดร.พิชญ พัฒนสัตยวงศ์", "inst": "สถาบันวิทยสิริเมธี", "budget": 5000000, "inGBP": 0, "inJPY": 0, "inPHP": 0, "inTHB": 0, "years": 3, "thInst": 0, "priv": 0, "foreign": 2, "program": "e-ASIA JRP", "out": {"O1": {"t": 8, "h": 0, "m": 5, "l": 3}, "O2": 3, "O3": 0, "O4": 1, "O5": 0, "O6": 1, "O7": 0, "O8": 1, "O9": 0, "O10": 0}, "oc": {"C1": 3, "C2": 50, "C3": 1, "C4": 0, "C5": 1, "C6": 1, "C7": 0, "C8": 0, "C9": 0, "C10": 0, "C11": 1, "C12": 1, "C13": 0, "C14": 2}}, {"seq": 2, "contract": "B49G680108", "th": "โครงการการเพิ่มมูลค่าของเสียชีวมวลเปียกสู่อุตสาหกรรมไบโอรีไฟเนอรีอย่างยั่งยืนโดยผสมผสานผ่านระบบสารสนเทศทางภูมิศาสตร์ผ่านเครือข่ายความร่วมมือในภูมิภาคเอเชียตะวันออก", "en": "Improving the Sustainability of Resource Recovery from Wet Biomass Waste: Experimentally-Validated GIS-Based Integrated Biorefineries for Cleaner Mobility", "pi": "ศ. ดร.อาภาณี เหลืองนฤมิตชัย", "inst": "จุฬาลงกรณ์มหาวิทยาลัย", "budget": 5000000, "inGBP": 0, "inJPY": 0, "inPHP": 0, "inTHB": 0, "years": 3, "thInst": 2, "priv": 0, "foreign": 3, "program": "e-ASIA JRP", "out": {"O1": {"t": 2, "h": 0, "m": 0, "l": 2}, "O2": 2, "O3": 0, "O4": 0, "O5": 0, "O6": 0, "O7": 1, "O8": 1, "O9": 0, "O10": 0}, "oc": {"C1": 2, "C2": 0, "C3": 0, "C4": 1, "C5": 1, "C6": 0, "C7": 0, "C8": 0, "C9": 0, "C10": 0, "C11": 0, "C12": 1, "C13": 0, "C14": 0}}, {"seq": 3, "contract": "B49G680109", "th": "โครงการการพัฒนาเทคนิคการอิเล็กโทรรีฟอร์มิ่งของชีวมวลเพื่อผลิตไฮโดรเจนสีเขียวและสารเคมีมูลค่าเพิ่มผ่านความร่วมมือระหว่างประเทศสำหรับนวัตกรรมพลังงานสะอาด", "en": "Integrated Biomass Upgrading: Advancing Hydrogen and Valuable Green Chemicals through Electroreforming (BIOEC)", "pi": "รศ. ดร.สุรเทพ เขียวหอม", "inst": "จุฬาลงกรณ์มหาวิทยาลัย", "budget": 4983000, "inGBP": 0, "inJPY": 0, "inPHP": 0, "inTHB": 0, "years": 3, "thInst": 1, "priv": 0, "foreign": 2, "program": "e-ASIA JRP", "out": {"O1": {"t": 6, "h": 6, "m": 0, "l": 0}, "O2": 5, "O3": 0, "O4": 0, "O5": 0, "O6": 0, "O7": 1, "O8": 1, "O9": 0, "O10": 0}, "oc": {"C1": 5, "C2": 0, "C3": 0, "C4": 0, "C5": 0, "C6": 0, "C7": 0, "C8": 0, "C9": 0, "C10": 0, "C11": 0, "C12": 1, "C13": 0, "C14": 3}}, {"seq": 4, "contract": "B49G680110", "th": "โครงการการพัฒนาโมเดลปัญญาประดิษฐ์เพื่อทำนายโภชนาการเฉพาะบุคคลในการป้องกันภาวะเมทาบอลิกซินโดรมผ่านอาหารที่มีใยอาหารสูงเพื่อสร้างความร่วมมืออย่างยั่งยืนในภูมิภาคเอเชียตะวันออก", "en": "A joint of research study for development of machine learning (ML) for personalized nutrition prediction on multi-national population after to consume high dietary fiber for metabolic syndrome prevention", "pi": "รศ. ดร.วรางคณา ศรีจำนงค์", "inst": "สถาบันโภชนาการ มหาวิทยาลัยมหิดล", "budget": 4928000, "inGBP": 0, "inJPY": 0, "inPHP": 0, "inTHB": 0, "years": 3, "thInst": 0, "priv": 0, "foreign": 3, "program": "e-ASIA JRP", "out": {"O1": {"t": 2, "h": 0, "m": 0, "l": 2}, "O2": 2, "O3": 0, "O4": 2, "O5": 0, "O6": 0, "O7": 2, "O8": 1, "O9": 0, "O10": 2}, "oc": {"C1": 2, "C2": 1, "C3": 1, "C4": 1, "C5": 3, "C6": 1, "C7": 0, "C8": 0, "C9": 0, "C10": 1, "C11": 0, "C12": 1, "C13": 1, "C14": 3}}, {"seq": 5, "contract": "B49G680111", "th": "โครงการการพัฒนาระบบบูรณาการเซลล์ไฟฟ้าชีวภาพแบบครบวงจรเพื่อการบำบัดน้ำเสียและผลิตไฮโดรเจนสีเขียวผ่านความร่วมมือระหว่างยุโรปและเอเชียตะวันออกเฉียงใต้สู่เศรษฐกิจหมุนเวียนและพลังงานสะอาด", "en": "Green Hydrogen Production from Wastewater through Bioelectrochemical Systems", "pi": "ดร.กรกช สมบัติมั่นคง", "inst": "ศูนย์เทคโนโลยีพลังงานแห่งชาติ สวทช.", "budget": 5000000, "inGBP": 0, "inJPY": 0, "inPHP": 0, "inTHB": 0, "years": 3, "thInst": 1, "priv": 0, "foreign": 2, "program": "JFS", "out": {"O1": {"t": 8, "h": 6, "m": 1, "l": 1}, "O2": 6, "O3": 0, "O4": 0, "O5": 2, "O6": 0, "O7": 1, "O8": 1, "O9": 0, "O10": 0}, "oc": {"C1": 3, "C2": 0, "C3": 0, "C4": 1, "C5": 1, "C6": 0, "C7": 0, "C8": 2, "C9": 0, "C10": 0, "C11": 0, "C12": 1, "C13": 0, "C14": 1}}, {"seq": 6, "contract": "B49G680112", "th": "โครงการการพัฒนาตัวเร่งปฏิกิริยาจากของเสียอุตสาหกรรมและชีวมวลเพื่อรีไซเคิลคาร์บอนไดออกไซด์เป็นผลิตภัณฑ์มูลค่าสูงผ่านความร่วมมือวิจัยขั้นแนวหน้าระหว่างเอเชียตะวันออกเฉียงใต้และยุโรป", "en": "Utilizing Industrial and Biomass Waste-Derived Catalysts for Recycling CO2 into High-Value Energy Resources: RECO2VER", "pi": "ดร.พงษ์ธนวัฒน์ เข็มทอง", "inst": "ศูนย์นาโนเทคโนโลยีแห่งชาติ สำนักงานพัฒนาวิทยาศาสตร์และเทคโนโลยีแห่งชาติ (สวทช.)", "budget": 5000000, "inGBP": 0, "inJPY": 0, "inPHP": 0, "inTHB": 0, "years": 3, "thInst": 3, "priv": 0, "foreign": 3, "program": "JFS", "out": {"O1": {"t": 25, "h": 9, "m": 5, "l": 11}, "O2": 6, "O3": 0, "O4": 0, "O5": 0, "O6": 0, "O7": 0, "O8": 1, "O9": 0, "O10": 0}, "oc": {"C1": 6, "C2": 30, "C3": 0, "C4": 0, "C5": 0, "C6": 0, "C7": 3, "C8": 0, "C9": 0, "C10": 0, "C11": 0, "C12": 1, "C13": 0, "C14": 2}}, {"seq": 7, "contract": "B49G680113", "th": "โครงการการพัฒนาเครื่องมือสนับสนุนการตัดสินใจเพื่อเพิ่มประสิทธิภาพการหมุนเวียนคาร์บอนจากขยะพลาสติกและชีวมวลผ่านเครือข่ายความร่วมมือนานาชาติเพื่อบรรเทาการเปลี่ยนแปลงสภาพภูมิอากาศ", "en": "Mapping and optimizing carbon circularity and climate impact of regional waste and residue management based on recovery and recycling technologies (OptiCWaste)", "pi": "ผศ. ดร.อวัสดา พงศ์พิพัฒน์", "inst": "บัณฑิตวิทยาลัยร่วมด้านพลังงานและสิ่งแวดล้อม มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี", "budget": 4999500, "inGBP": 0, "inJPY": 0, "inPHP": 0, "inTHB": 0, "years": 3, "thInst": 0, "priv": 0, "foreign": 3, "program": "JFS", "out": {"O1": {"t": 53, "h": 0, "m": 50, "l": 3}, "O2": 0, "O3": 0, "O4": 0, "O5": 0, "O6": 0, "O7": 3, "O8": 1, "O9": 0, "O10": 1}, "oc": {"C1": 2, "C2": 0, "C3": 3, "C4": 2, "C5": 0, "C6": 0, "C7": 0, "C8": 0, "C9": 0, "C10": 0, "C11": 0, "C12": 1, "C13": 1, "C14": 3}}, {"seq": 8, "contract": "B49G680114", "th": "โครงการการแปรรูปขยะพลาสติกและโลหะเป็นตัวเร่งปฏิกิริยาประสิทธิภาพสูงสำหรับการผลิตไฮโดรเจนสีเขียวผ่านเครือข่ายความร่วมมือนานาชาติเพื่อแนวทางเศรษฐกิจหมุนเวียนและพลังงานสะอาด", "en": "Circular economy for waste to energy conversion: local plastic waste upcycling to multifunctional catalysts for green H2 generation", "pi": "ศ. ดร.มาโกโตะ โอกาวะ", "inst": "สถาบันวิทยสิริเมธี", "budget": 5000000, "inGBP": 0, "inJPY": 0, "inPHP": 0, "inTHB": 0, "years": 3, "thInst": 0, "priv": 0, "foreign": 4, "program": "JFS", "out": {"O1": {"t": 2, "h": 0, "m": 0, "l": 2}, "O2": 4, "O3": 0, "O4": 0, "O5": 0, "O6": 0, "O7": 0, "O8": 1, "O9": 0, "O10": 0}, "oc": {"C1": 4, "C2": 20, "C3": 1, "C4": 0, "C5": 2, "C6": 10, "C7": 0, "C8": 0, "C9": 0, "C10": 0, "C11": 1, "C12": 1, "C13": 0, "C14": 1}}, {"seq": 9, "contract": "B49G680115", "th": "โครงการต่อยอดการพัฒนาขั้วไฟฟ้าและการปรับปรุงคุณสมบัติระหว่างพื้นผิวสำหรับแบตเตอรี่ไอออนโลหะ โดยใช้เทคโนโลยีแสงซินโครตรอนเพื่อเพิ่มประสิทธิภาพในการกักเก็บพลังงานไฟฟ้า", "en": "Development of electrodes and enhancement of interface properties for metal-ion batteries using synchrotron-based technology phase 2", "pi": "ดร.พินิจ กิจขุนทด", "inst": "สถาบันวิจัยแสงซินโครตรอน (องค์การมหาชน)", "budget": 8499200, "inGBP": 0, "inJPY": 0, "inPHP": 0, "inTHB": 0, "years": 1, "thInst": 2, "priv": 0, "foreign": 0, "program": "Global Partnership - East", "out": {"O1": {"t": 7, "h": 2, "m": 3, "l": 2}, "O2": 5, "O3": 0, "O4": 1, "O5": 2, "O6": 0, "O7": 0, "O8": 0, "O9": 0, "O10": 0}, "oc": {"C1": 5, "C2": 0, "C3": 0, "C4": 0, "C5": 0, "C6": 0, "C7": 0, "C8": 2, "C9": 0, "C10": 0, "C11": 0, "C12": 0, "C13": 0, "C14": 0}}, {"seq": 10, "contract": "B49G680116", "th": "โครงการต่อยอดการยกระดับความร่วมมือด้านบุคลากรศักยภาพสูงในอาเซียนผ่านแพลตฟอร์มดิจิทัล", "en": "Talent Utilization Platform for ASEAN Talent Pool Phase 3", "pi": "ผศ. ดร.สิริกร สันติโรจนกุล", "inst": "วิทยาลัยศิลปะ สื่อ และเทคโนโลยี มหาวิทยาลัยเชียงใหม่", "budget": 2000000, "inGBP": 0, "inJPY": 0, "inPHP": 0, "inTHB": 0, "years": 1, "thInst": 1, "priv": 0, "foreign": 0, "program": "ATM", "out": {"O1": {"t": 0, "h": 0, "m": 0, "l": 0}, "O2": 0, "O3": 0, "O4": 0, "O5": 0, "O6": 2, "O7": 1, "O8": 0, "O9": 0, "O10": 0}, "oc": {"C1": 0, "C2": 0, "C3": 1, "C4": 0, "C5": 0, "C6": 0, "C7": 2, "C8": 0, "C9": 0, "C10": 0, "C11": 0, "C12": 0, "C13": 0, "C14": 1}}, {"seq": 11, "contract": "B49G680117", "th": "โครงการพัฒนาจุลินทรีย์สังเคราะห์แสงที่มีความสามารถในการย่อยสลายไฮโดรคาร์บอนในน้ำเสียเพื่อเพิ่มประสิทธิภาพการผลิตไฟฟ้าและการกักเก็บพลังงานสู่การใช้จริงงานจริงในภาคอุตสาหกรรมภายใต้ความร่วมมือไทย-สหราชอาณาจักร", "en": "Scaling Up High-Performance Hybrid Microbial Fuel Cells for Sustainable Energy Recovery from Petroleum Wastewater: A Pilot-Scale Demonstration", "pi": "ผศ. ดร.ชมาพร เจียรบุตร", "inst": "มหาวิทยาลัยเกษตรศาสตร์", "budget": 5000000, "inGBP": 100000, "inJPY": 0, "inPHP": 0, "inTHB": 4203949.4, "years": 2, "thInst": 3, "priv": 0, "foreign": 1, "program": "British Council - ISPF", "out": {"O1": {"t": 3, "h": 0, "m": 0, "l": 3}, "O2": 2, "O3": 0, "O4": 0, "O5": 2, "O6": 0, "O7": 0, "O8": 1, "O9": 0, "O10": 0}, "oc": {"C1": 2, "C2": 0, "C3": 0, "C4": 0, "C5": 3, "C6": 0, "C7": 0, "C8": 2, "C9": 0, "C10": 0, "C11": 0, "C12": 1, "C13": 0, "C14": 1}}, {"seq": 12, "contract": "B49G680118", "th": "โครงการศึกษากลไกทางวิทยาศาสตร์พื้นผิวที่ควบคุมประสิทธิภาพการกักเก็บไฮโดรเจนและคาร์บอนไดออกไซด์ในชั้นหินอุ้มน้ำผ่านหลักการไหลแทนที่ของไหลในชั้นหินอุ้มน้ำและการจำลองแหล่งกักเก็บสู่การนำข้อมูลไปใช้จริงในระดับสนามภายใต้ความร่วมมือไทย-สหราชอาณาจักร", "en": "Clean Hydrogen and CO2 Storages for Energy Transition: From Surface Science Toward Field-Scale Implementation", "pi": "รศ. ดร.สุพฤทธิ์ ตั้งพฤทธิ์กุล", "inst": "มหาวิทยาลัยเชียงใหม่", "budget": 5000000, "inGBP": 99483.33, "inJPY": 0, "inPHP": 0, "inTHB": 4182228.85, "years": 2, "thInst": 2, "priv": 2, "foreign": 1, "program": "British Council - ISPF", "out": {"O1": {"t": 10, "h": 3, "m": 2, "l": 5}, "O2": 2, "O3": 0, "O4": 1, "O5": 0, "O6": 0, "O7": 0, "O8": 1, "O9": 0, "O10": 0}, "oc": {"C1": 4, "C2": 0, "C3": 0, "C4": 0, "C5": 1, "C6": 0, "C7": 0, "C8": 1, "C9": 0, "C10": 0, "C11": 0, "C12": 1, "C13": 1, "C14": 0}}, {"seq": 13, "contract": "B49G680119", "th": "โครงการการพัฒนาโมเดลปัญญาประดิษฐ์ที่มีความแม่นยำและความปลอดภัยของข้อมูลทางการแพทย์เพื่อทำนายค่ามวลกระดูกจากภาพเอ็กซ์เรย์กระดูกสะโพกด้วยเทคนิคการเรียนรู้ของเครื่องและการเรียนรู้เชิงลึก", "en": "Efficient Privacy-Preserving Federated Learning for Osteoporosis Diagnosis from Radiography Data", "pi": "ผศ. ดร.สมฤดี ดีไพศาล", "inst": "มหาวิทยาลัยธรรมศาสตร์", "budget": 4981400, "inGBP": 94008.48, "inJPY": 0, "inPHP": 0, "inTHB": 3952068.93, "years": 2, "thInst": 3, "priv": 0, "foreign": 1, "program": "British Council - ISPF", "out": {"O1": {"t": 4, "h": 0, "m": 1, "l": 3}, "O2": 4, "O3": 0, "O4": 1, "O5": 0, "O6": 1, "O7": 1, "O8": 1, "O9": 0, "O10": 0}, "oc": {"C1": 4, "C2": 30, "C3": 1, "C4": 1, "C5": 3, "C6": 0, "C7": 0, "C8": 0, "C9": 0, "C10": 0, "C11": 1, "C12": 1, "C13": 0, "C14": 0}}, {"seq": 14, "contract": "B49G680120", "th": "โครงการการพัฒนาและวิจัยวัสดุโครงข่ายโลหะอินทรีย์สำหรับอิเล็กโทรไลเซอร์แบบเมมเบรนแลกเปลี่ยนโปรตอนเพื่อเพิ่มประสิทธิภาพการผลิตไฮโดรเจนสีเขียวที่อุณหภูมิปานกลางผ่านความร่วมมือระหว่างไทย-ญี่ปุ่น", "en": "Development of intermediate-temperature water electrolyzer using proton-conductive metal-organic frameworks", "pi": "ผศ. ดร.กนกวรรณ กองพัฒน์พาณิชย์", "inst": "สถาบันวิทยสิริเมธี", "budget": 4998510, "inGBP": 0, "inJPY": 31200000, "inPHP": 0, "inTHB": 6291168, "years": 3, "thInst": 2, "priv": 0, "foreign": 1, "program": "JST", "out": {"O1": {"t": 10, "h": 0, "m": 5, "l": 5}, "O2": 9, "O3": 0, "O4": 2, "O5": 0, "O6": 0, "O7": 0, "O8": 1, "O9": 0, "O10": 0}, "oc": {"C1": 9, "C2": 50, "C3": 5, "C4": 0, "C5": 0, "C6": 0, "C7": 1, "C8": 0, "C9": 0, "C10": 1, "C11": 0, "C12": 1, "C13": 0, "C14": 3}}, {"seq": 15, "contract": "B49G680121", "th": "โครงการการออกแบบและพัฒนาวัสดุที่ใช้เป็นตัวเร่งปฏิกิริยาในการผลิตไฮโดรเจนจากกระบวนการทางไฟฟ้าเคมีที่มีประสิทธิภาพสูงโดยใช้การเรียนรู้ของเครื่องและเครื่องมือสเปกโทรสโกปี", "en": "A Combined Spectroscopic and Machine Learning Approach to Boosting Green Hydrogen Production via the Electro-oxidation of Urea", "pi": "ผศ. ดร.แก้วตา เจตศรีสุภาพ", "inst": "มหาวิทยาลัยขอนแก่น", "budget": 5000000, "inGBP": 0, "inJPY": 24000000, "inPHP": 0, "inTHB": 4839360, "years": 3, "thInst": 3, "priv": 0, "foreign": 1, "program": "JST", "out": {"O1": {"t": 18, "h": 8, "m": 2, "l": 8}, "O2": 5, "O3": 0, "O4": 2, "O5": 0, "O6": 0, "O7": 0, "O8": 1, "O9": 0, "O10": 0}, "oc": {"C1": 5, "C2": 0, "C3": 0, "C4": 0, "C5": 8, "C6": 0, "C7": 0, "C8": 0, "C9": 0, "C10": 0, "C11": 2, "C12": 1, "C13": 0, "C14": 12}}, {"seq": 16, "contract": "B49G680122", "th": "โครงการการเพิ่มประสิทธิภาพการผลิตไฮโดรเจนสีเขียวโดยการควบคุมปฏิกิริยาย้อนกลับของตัวเร่งปฏิกิริยาด้วยแสงแบบ Z-Scheme จากการพัฒนาวัสดุโฟโตแคตาลิสต์ที่มีประสิทธิภาพสูงที่ตอบสนองต่อแสงความยาวคลื่นยาว", "en": "Study on the Drastic Enhancement of Hydrogen Production Efficiency in Z-Scheme Photocatalysts through Reverse Reaction Control", "pi": "รศ. ดร.พรนภา สุจริตวรกุล", "inst": "จุฬาลงกรณ์มหาวิทยาลัย", "budget": 5000000, "inGBP": 0, "inJPY": 40560000, "inPHP": 0, "inTHB": 8178518.4, "years": 3, "thInst": 3, "priv": 0, "foreign": 1, "program": "JST", "out": {"O1": {"t": 4, "h": 3, "m": 0, "l": 1}, "O2": 3, "O3": 0, "O4": 1, "O5": 1, "O6": 0, "O7": 0, "O8": 1, "O9": 0, "O10": 0}, "oc": {"C1": 3, "C2": 0, "C3": 0, "C4": 0, "C5": 3, "C6": 0, "C7": 0, "C8": 1, "C9": 0, "C10": 0, "C11": 0, "C12": 1, "C13": 0, "C14": 0}}, {"seq": 17, "contract": "B49G680123", "th": "โครงการการพัฒนาต้นแบบและประยุกต์ใช้เทคโนโลยีเพื่อเปลี่ยนวัสดุเหลือทิ้งจากอุตสาหกรรมการเกษตรเป็นไบโอไฮโดรเจนที่มีความบริสุทธิ์สูงเพื่อใช้เป็นเซลล์เชื้อเพลิงในรถยนต์ไฟฟ้า (FCEV)", "en": "Integration of high-purity biohydrogen production processes for FCEV utilization", "pi": "ศ. ดร.นวดล เหล่าศิริพจน์", "inst": "มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี", "budget": 5000000, "inGBP": 0, "inJPY": 31200000, "inPHP": 0, "inTHB": 6291168, "years": 3, "thInst": 3, "priv": 0, "foreign": 1, "program": "JST", "out": {"O1": {"t": 4, "h": 0, "m": 0, "l": 4}, "O2": 5, "O3": 0, "O4": 0, "O5": 0, "O6": 0, "O7": 0, "O8": 1, "O9": 0, "O10": 0}, "oc": {"C1": 5, "C2": 0, "C3": 0, "C4": 0, "C5": 0, "C6": 0, "C7": 0, "C8": 0, "C9": 0, "C10": 0, "C11": 0, "C12": 1, "C13": 0, "C14": 0}}, {"seq": 18, "contract": "B49G680124", "th": "โครงการศึกษาและวิเคราะห์สภาวะที่เหมาะสมในการผลิตไบโอไฮเทนจากใบอ้อยที่ผ่านการปรับสภาพด้วยวิธีไฮโดรเทอร์มอล และเพิ่มมูลค่าจากของเสียที่เหลือทิ้งจากกระบวนการผลิตไบโอไฮเทน เพื่อลดฝุ่น PM2.5 และสร้างพลังงานหมุนเวียน ในพื้นที่ภาคอีสานของประเทศไทย", "en": "Innovative Green Technology: Thermotolerant Biohythane Production from Sugarcane Leaves for PM2.5 Reduction and Renewable Energy in Esan, Thailand", "pi": "ศ. ดร.อลิศรา เรืองแสง", "inst": "มหาวิทยาลัยขอนแก่น", "budget": 5000000, "inGBP": 0, "inJPY": 31200000, "inPHP": 0, "inTHB": 6291168, "years": 3, "thInst": 3, "priv": 0, "foreign": 1, "program": "JST", "out": {"O1": {"t": 9, "h": 0, "m": 3, "l": 6}, "O2": 3, "O3": 0, "O4": 0, "O5": 1, "O6": 0, "O7": 0, "O8": 1, "O9": 0, "O10": 0}, "oc": {"C1": 3, "C2": 0, "C3": 0, "C4": 0, "C5": 0, "C6": 0, "C7": 3, "C8": 0, "C9": 0, "C10": 0, "C11": 0, "C12": 1, "C13": 0, "C14": 0}}, {"seq": 19, "contract": "B49G680139", "th": "โครงการการขยายขนาดเซลล์ขั้วไฟฟ้าโดยการพัฒนาตัวเร่งปฏิกิริยาประสิทธิภาพสูงเพื่อเพิ่มศักยภาพในการต่อยอดสู่ภาคอุตสาหกรรม", "en": "Advancing Integrated Materials and Devices for Electrochemical CO2 Reduction (AIM-COR)", "pi": "ดร.ปองกานต์ จักรธรานนท์", "inst": "สำนักงานพัฒนาวิทยาศาสตร์และเทคโนโลยีแห่งชาติ (สวทช.) ศูนย์นาโนเทคโนโลยีแห่งชาติ", "budget": 5000000, "inGBP": 0, "inJPY": 0, "inPHP": 7857033.96, "inTHB": 4208518.1, "years": 3, "thInst": 2, "priv": 0, "foreign": 1, "program": "IDEAL-PH", "out": {"O1": {"t": 10, "h": 2, "m": 1, "l": 7}, "O2": 2, "O3": 0, "O4": 2, "O5": 0, "O6": 0, "O7": 0, "O8": 1, "O9": 0, "O10": 0}, "oc": {"C1": 2, "C2": 10, "C3": 2, "C4": 0, "C5": 10, "C6": 0, "C7": 0, "C8": 0, "C9": 0, "C10": 0, "C11": 1, "C12": 1, "C13": 0, "C14": 3}}, {"seq": 20, "contract": "B49G680140", "th": "โครงการการพัฒนาต้นแบบ Decision-Support Systems ผ่านการประยุกต์ใช้เทคโนโลยีควอนตัมและปัญญาประดิษฐ์เพื่อสนับสนุนการวางจุดตั้งสถานีชาร์จและแหล่งผลิตพลังงานหมุนเวียน", "en": "Integrating Space, Quantum and AI technology for Next-generation Decision-support for E-vehicle and Renewable energy infrastructure planning", "pi": "รศ. ดร.วรวัฒน์ มีวาสนา", "inst": "มหาวิทยาลัยเทคโนโลยีสุรนารี", "budget": 5000000, "inGBP": 0, "inJPY": 0, "inPHP": 8528455.37, "inTHB": 4568156.25, "years": 3, "thInst": 3, "priv": 0, "foreign": 1, "program": "IDEAL-PH", "out": {"O1": {"t": 5, "h": 0, "m": 1, "l": 4}, "O2": 2, "O3": 0, "O4": 1, "O5": 0, "O6": 0, "O7": 0, "O8": 1, "O9": 0, "O10": 0}, "oc": {"C1": 2, "C2": 0, "C3": 0, "C4": 0, "C5": 0, "C6": 0, "C7": 0, "C8": 0, "C9": 0, "C10": 0, "C11": 0, "C12": 1, "C13": 0, "C14": 0}}]};
+const APP_VER = 'V0.2';
+const KEY_REAL = 'd3kr.real.v1', KEY_DEMO = 'd3kr.demo.v1', KEY_UI = 'd3kr.ui.v1';
+const TODAY = new Date(); TODAY.setHours(0,0,0,0);
+const YEAR_RANGE = [2566, 2567, 2568, 2569, 2570];
+const XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+
+const OUTPUTS = [
+  {id:'O1', no:1, name:'การพัฒนากำลังคน', short:'กำลังคน', unit:'คน'},
+  {id:'O2', no:2, name:'ต้นฉบับบทความวิจัย (Manuscript)', short:'ต้นฉบับบทความ', unit:'เรื่อง'},
+  {id:'O3', no:3, name:'หนังสือ', short:'หนังสือ', unit:'เล่ม'},
+  {id:'O4', no:4, name:'ต้นแบบผลิตภัณฑ์ หรือเทคโนโลยี/กระบวนการใหม่ หรือนวัตกรรมทางสังคม', short:'ต้นแบบ/เทคโนโลยี', unit:'ชิ้น'},
+  {id:'O5', no:5, name:'ทรัพย์สินทางปัญญา (สิทธิบัตร/อนุสิทธิบัตร/สิ่งประดิษฐ์)', short:'ทรัพย์สินทางปัญญา', unit:'คำขอ'},
+  {id:'O6', no:6, name:'เครื่องมือ และโครงสร้างพื้นฐาน', short:'เครื่องมือ/โครงสร้างพื้นฐาน', unit:'รายการ'},
+  {id:'O7', no:7, name:'ฐานข้อมูล ระบบและกลไก หรือมาตรฐาน', short:'ฐานข้อมูล/ระบบ/มาตรฐาน', unit:'รายการ'},
+  {id:'O8', no:8, name:'เครือข่ายความร่วมมือระดับนานาชาติ (ไม่นับเครือข่ายเก่า)', short:'เครือข่ายความร่วมมือ', unit:'เครือข่าย'},
+  {id:'O9', no:9, name:'การลงทุนวิจัยและนวัตกรรม', short:'การลงทุน ววน.', unit:'รายการ'},
+  {id:'O10',no:10,name:'ข้อเสนอแนะเชิงนโยบายและมาตรการ', short:'ข้อเสนอเชิงนโยบาย', unit:'เรื่อง'}
+];
+const O1_SUBS = [
+  {id:'h', name:'สูง: บุคลากรภาครัฐผู้ที่มีทักษะขั้นสูง', short:'บุคลากรทักษะสูง', tiny:'สูง (บุคลากรภาครัฐ)'},
+  {id:'m', name:'กลาง: นักวิจัยหลังปริญญาเอก', short:'นักวิจัยหลังปริญญาเอก', tiny:'กลาง (Postdoc)'},
+  {id:'l', name:'ต่ำ: นักศึกษาระดับ ป.โท/ป.เอก', short:'นักศึกษา ป.โท/ป.เอก', tiny:'ต่ำ (ป.โท/ป.เอก)'}
+];
+const OUTCOMES = [
+  {id:'C1', no:1, name:'ผลงานตีพิมพ์ (Publications)', short:'ผลงานตีพิมพ์'},
+  {id:'C2', no:2, name:'การอ้างอิง (Citations)', short:'การอ้างอิง'},
+  {id:'C3', no:3, name:'เครื่องมือและระเบียบวิธีการวิจัย (Research tools and methods)', short:'เครื่องมือ/ระเบียบวิธี'},
+  {id:'C4', no:4, name:'ฐานข้อมูลและแบบจำลองวิจัย (Research databases and models)', short:'ฐานข้อมูล/แบบจำลอง'},
+  {id:'C5', no:5, name:'ความก้าวหน้าในวิชาชีพของบุคลากรด้าน ววน. (Next destination)', short:'Next destination'},
+  {id:'C6', no:6, name:'รางวัลและการยอมรับ (Awards and recognition)', short:'รางวัล'},
+  {id:'C7', no:7, name:'การใช้ประโยชน์จากเครื่องมือ อุปกรณ์ ห้องวิจัยและโครงสร้างพื้นฐาน (Use of facilities and resources)', short:'ใช้ประโยชน์เครื่องมือ'},
+  {id:'C8', no:8, name:'ทรัพย์สินทางปัญญาและการอนุญาตให้ใช้สิทธิ (Intellectual property and licensing)', short:'IP/อนุญาตใช้สิทธิ'},
+  {id:'C9', no:9, name:'การจัดตั้งบริษัท (Spin-off Companies)', short:'Spin-off'},
+  {id:'C10',no:10,name:'ผลิตภัณฑ์ใหม่ (New Products)', short:'ผลิตภัณฑ์ใหม่'},
+  {id:'C11',no:11,name:'ทุนวิจัยต่อยอด (Further funding)', short:'ทุนต่อยอด'},
+  {id:'C12',no:12,name:'ความร่วมมือหรือหุ้นส่วนความร่วมมือ (Collaborations and partnerships)', short:'ความร่วมมือ'},
+  {id:'C13',no:13,name:'การผลักดันนโยบาย แนวปฏิบัติ แผนและกฎระเบียบ (Influence on policy, practice, plan and regulations)', short:'ผลักดันนโยบาย'},
+  {id:'C14',no:14,name:'กิจกรรมการมีส่วนร่วม (Engagement activities)', short:'กิจกรรมมีส่วนร่วม'}
+];
+const ROUNDS = ['รายงานความก้าวหน้า ครั้งที่ 1','รายงานความก้าวหน้า ครั้งที่ 2','รายงานความก้าวหน้า ครั้งที่ 3','รายงานฉบับสมบูรณ์','ข้อมูลเพิ่มเติมระหว่างรอบ'];
+const TITLE_LABEL = {
+  O1:['ชื่อ-สกุล','เช่น น.ส.สุดา ใจดี (นักศึกษา ป.เอก)'], O2:['ชื่อบทความ','ชื่อต้นฉบับบทความ'], O3:['ชื่อหนังสือ',''],
+  O4:['ชื่อต้นแบบ/เทคโนโลยี',''], O5:['ชื่อการประดิษฐ์',''], O6:['ชื่อเครื่องมือ/โครงสร้างพื้นฐาน',''],
+  O7:['ชื่อฐานข้อมูล/ระบบ/มาตรฐาน',''], O8:['ชื่อเครือข่าย/ความร่วมมือ',''], O9:['ชื่อรายการลงทุน',''], O10:['ชื่อข้อเสนอแนะ','']
+};
+const FIELDS = {
+  O1:[{k:'org',l:'สังกัด/หลักสูตร'},{k:'role',l:'บทบาทในโครงการ'}],
+  O2:[{k:'journal',l:'วารสาร/การประชุมเป้าหมาย'},{k:'stage',l:'สถานะต้นฉบับ',opts:['ร่างต้นฉบับ','ส่งวารสารแล้ว','อยู่ระหว่างพิจารณา','ตอบรับตีพิมพ์']}],
+  O3:[{k:'publisher',l:'สำนักพิมพ์'},{k:'isbn',l:'ISBN'}],
+  O4:[{k:'ptype',l:'ประเภท',opts:['ต้นแบบผลิตภัณฑ์','เทคโนโลยี/กระบวนการใหม่','นวัตกรรมทางสังคม']},{k:'trl',l:'ระดับ TRL'}],
+  O5:[{k:'iptype',l:'ประเภท',opts:['สิทธิบัตรการประดิษฐ์','สิทธิบัตรการออกแบบ','อนุสิทธิบัตร','อื่น ๆ']},{k:'appno',l:'เลขที่คำขอ'},{k:'filed',l:'วันที่ยื่นคำขอ',type:'date'}],
+  O6:[{k:'site',l:'สถานที่ติดตั้ง/ใช้งาน'}],
+  O7:[{k:'stype',l:'ประเภท',opts:['ฐานข้อมูล','ระบบ','กลไก','มาตรฐาน']},{k:'url',l:'ที่อยู่ระบบ (URL)'}],
+  O8:[{k:'partner',l:'หน่วยงานคู่ความร่วมมือ'},{k:'country',l:'ประเทศ'},{k:'form',l:'รูปแบบ',opts:['MOU','MOA','LOI','ข้อตกลงความร่วมมือโครงการ','อื่น ๆ']}],
+  O9:[{k:'investor',l:'ผู้ร่วมลงทุน'},{k:'amount',l:'มูลค่า (บาท)',type:'number'}],
+  O10:[{k:'to',l:'หน่วยงานที่รับข้อเสนอ'}]
+};
+const DEFAULT_KR = {O8:{code:'KR3 P23',text:'ร้อยละของสถาบัน/ศูนย์วิจัยในสถาบันอุดมศึกษา หน่วยงานภาครัฐและหน่วยงานภาคเอกชนหรือภาคประชาสังคมที่เป็นสมาชิกเครือข่ายความร่วมมือระดับนานาชาติด้าน ววน. และมีโครงการร่วมกับเครือข่าย (เพิ่มขึ้นร้อยละ 40 ในช่วงปี 2566-2570)'}};
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf = n => Number(n||0).toLocaleString('th-TH');
+const money = n => n ? Number(n).toLocaleString('th-TH',{maximumFractionDigits:0}) + ' บาท' : '–';
+const pct = x => x==null ? '–' : Math.round(x*100) + '%';
+const uid = () => 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const parseD = s => { if(!s) return null; const d = new Date(s + 'T00:00:00'); return isNaN(d) ? null : d; };
+const fmtD = s => { const d = parseD(s); return d ? d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}) : '–'; };
+const isoD = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+const itemsOf = kind => kind === 'oc' ? OUTCOMES : OUTPUTS;
+const itemDef = (kind,id) => itemsOf(kind).find(i => i.id === id);
+function store(k, v){ try { if(v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch(e){ return null; } }
+
+/* ---------- state ---------- */
+let MODE = 'demo';
+let S = null;
+let UI = {view:'overview', pid:null, fy:null, ovKind:'out', prog:'all', q:'', sort:'seq', ptab:'out',
+          intake:{pid:'', round:ROUNDS[0], date:'', doc:'', kind:'out', all:false},
+          reg:{q:'', pid:'', item:'', status:'', round:''}};
+
+function baseState(){
+  return {
+    v:1, fy:SEED.fy, analyst:'ต้นน้ำ', kr:JSON.parse(JSON.stringify(DEFAULT_KR)), entries:[], savedAt:null,
+    projects: SEED.projects.map(p => ({
+      id:p.contract, fy:SEED.fy, seq:p.seq, contract:p.contract, th:p.th, en:p.en, pi:p.pi, inst:p.inst, program:p.program,
+      budget:p.budget, inGBP:p.inGBP, inJPY:p.inJPY, inPHP:p.inPHP, inTHB:p.inTHB, years:p.years,
+      thInst:p.thInst, priv:p.priv, foreign:p.foreign, start:'', end:'', note:'',
+      targets: JSON.parse(JSON.stringify(p.out)), ocTargets: JSON.parse(JSON.stringify(p.oc)), targetLog:[]
+    }))
+  };
+}
+function rng(seed){ return function(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function demoState(){
+  const st = baseState(); const R = rng(68);
+  st.projects.forEach((p, i) => {
+    const s = new Date(2025, 2 + Math.floor(R()*5), 1 + Math.floor(R()*27));
+    const e = new Date(s); e.setFullYear(e.getFullYear() + (p.years||1)); e.setDate(e.getDate()-1);
+    p.start = isoD(s); p.end = isoD(e);
+    const elapsed = Math.max(0, Math.min(1, (TODAY - s) / (e - s)));
+    const drive = Math.max(0, Math.min(1, elapsed * (0.45 + R()*0.9)));
+    const add = (kind, item, sub, n, status, round) => { for(let k=0;k<n;k++){
+      const d = new Date(s.getTime() + (TODAY - s) * (0.3 + R()*0.65));
+      st.entries.push({id:uid()+k, pid:p.id, kind, item, sub, qty:1, title:'ตัวอย่างผลงาน ' + (itemDef(kind,item).short) + (sub ? ' (' + O1_SUBS.find(x=>x.id===sub).short + ')' : '') + ' ลำดับที่ ' + (k+1),
+        f:{}, round, date:isoD(d > TODAY ? TODAY : d), link:'', note:'', status, by:'ต้นน้ำ', at:new Date().toISOString()});
+    }};
+    OUTPUTS.forEach(o => {
+      if(o.id === 'O1'){ O1_SUBS.forEach(sb => { const t = p.targets.O1[sb.id]; if(!t) return;
+        const ok = Math.min(t, Math.floor(t * drive)); const pd = Math.min(t-ok, R() < .4 ? 1 + Math.floor(R()*2) : 0);
+        add('out','O1',sb.id,ok,'ok',ROUNDS[0]); add('out','O1',sb.id,pd,'pending',ROUNDS[1]); }); return; }
+      const t = p.targets[o.id]; if(!t) return;
+      let ok = Math.min(t, Math.floor(t * drive + (R() < .25 ? 1 : 0)));
+      if(o.id === 'O8' && elapsed > .2) ok = Math.max(ok, 1);
+      const pd = Math.min(t - ok, R() < .35 ? 1 : 0);
+      add('out', o.id, null, ok, 'ok', ROUNDS[0]); add('out', o.id, null, pd, 'pending', ROUNDS[1]);
+    });
+    OUTCOMES.forEach(o => { const t = p.ocTargets[o.id]; if(!t) return;
+      const ok = Math.min(t, Math.floor(t * drive * 0.7)); add('oc', o.id, null, Math.min(ok, 12), 'ok', ROUNDS[0]); });
+  });
+  return st;
+}
+function load(){
+  const ui = store(KEY_UI); if(ui){ try { const u = JSON.parse(ui); MODE = u.mode || 'demo'; if(u.theme) document.documentElement.dataset.theme = u.theme; if(UI.fy == null && u.fy) UI.fy = u.fy; } catch(e){} }
+  const raw = store(MODE === 'demo' ? KEY_DEMO : KEY_REAL);
+  if(raw){ try { S = JSON.parse(raw); } catch(e){ S = null; } }
+  if(!S || !S.projects){ S = MODE === 'demo' ? demoState() : baseState(); save(true); }
+  if(!S.kr) S.kr = JSON.parse(JSON.stringify(DEFAULT_KR));
+  S.projects.forEach(p => { if(!p.fy) p.fy = S.fy || SEED.fy; });
+  const ys = S.projects.map(p => p.fy);
+  if(UI.fy == null || (UI.fy !== 'all' && !years().includes(UI.fy))) UI.fy = ys.length ? Math.max.apply(null, ys) : YEAR_RANGE[0];
+  fixPid();
+}
+function save(quiet){
+  S.savedAt = new Date().toISOString();
+  store(MODE === 'demo' ? KEY_DEMO : KEY_REAL, JSON.stringify(S));
+  saveUI(); renderSaved();
+}
+function saveUI(){ store(KEY_UI, JSON.stringify({mode:MODE, theme:document.documentElement.dataset.theme||'', fy:UI.fy})); }
+function setMode(m){ MODE = m; saveUI(); S = null; UI.pid = null; UI.fy = null; load(); render(); toast(m === 'demo' ? 'เปิดข้อมูลตัวอย่างแล้ว' : 'กลับมาใช้ข้อมูลจริงแล้ว'); }
+
+/* ---------- calc ---------- */
+const P = id => S.projects.find(p => p.id === id);
+function years(){ const set = new Set(YEAR_RANGE); S.projects.forEach(p => set.add(p.fy)); return Array.from(set).sort((a,b) => a - b); }
+function scope(){ return UI.fy === 'all' ? S.projects : S.projects.filter(p => p.fy === UI.fy); }
+function fixPid(){ const sc = scope(); if(!sc.some(p => p.id === UI.pid)) UI.pid = sc.length ? sc[0].id : null; }
+const fyLabel = () => UI.fy === 'all' ? 'ทุกปีงบประมาณ' : 'ปีงบประมาณ ' + UI.fy;
+function target(p, kind, item, sub){
+  if(kind === 'oc') return +p.ocTargets[item] || 0;
+  if(item === 'O1') return +(sub ? p.targets.O1[sub] : p.targets.O1.t) || 0;
+  return +p.targets[item] || 0;
+}
+function got(pid, kind, item, sub){
+  let ok = 0, pd = 0;
+  for(const e of S.entries){ if(e.pid !== pid || e.kind !== kind || e.item !== item) continue; if(sub && e.sub !== sub) continue;
+    if(e.status === 'ok') ok += +e.qty || 0; else pd += +e.qty || 0; }
+  return {ok, pd};
+}
+function completion(p, kind){
+  kind = kind || 'out'; let n = 0, sum = 0, done = 0;
+  for(const it of itemsOf(kind)){ const t = target(p, kind, it.id); if(!t) continue; n++; const g = got(p.id, kind, it.id).ok; sum += Math.min(g/t, 1); if(g >= t) done++; }
+  return {n, done, frac: n ? sum/n : null};
+}
+function timeFrac(p){ const s = parseD(p.start), e = parseD(p.end); if(!s || !e || e <= s) return null; return Math.max(0, Math.min(1, (TODAY - s)/(e - s))); }
+function daysLeft(p){ const e = parseD(p.end); return e ? Math.round((e - TODAY)/86400000) : null; }
+function status(p){
+  const c = completion(p).frac, t = timeFrac(p), d = daysLeft(p);
+  if(c === 1) return {k:'done', l:'ครบตามเป้า'};
+  if(d === null) return {k:'nodate', l:'ยังไม่ระบุวันสิ้นสุด'};
+  if(d < 0) return {k:'late', l:'สิ้นสุดสัญญา ผลผลิตยังไม่ครบ'};
+  if((t - (c||0)) > .25 || (d < 180 && (c||0) < .8)) return {k:'risk', l:'ต้องติดตามใกล้ชิด'};
+  return {k:'track', l:'เป็นไปตามแผน'};
+}
+const pendingCount = () => S.entries.filter(e => e.status !== 'ok').length;
+function progOrder(p){ return S.projects.findIndex(x => x.fy === p.fy && x.program === p.program); }
+function programs(){ const out = []; scope().forEach(p => { if(!out.includes(p.program)) out.push(p.program); }); return out; }
+
+/* ---------- rendering primitives ---------- */
+function pipsHTML(t, ok, pd){
+  if(!t && !(ok+pd)) return '<span class="nil" aria-label="ไม่มีเป้าหมาย">–</span>';
+  if(!t) return '<span class="over">+' + (ok+pd) + '</span>';
+  if(t <= 10){
+    let h = '<span class="pips' + (t < 5 ? ' n' + t : '') + '">';
+    for(let i = 0; i < t; i++) h += '<i class="pip' + (i < ok ? ' a' : i < ok+pd ? ' p' : '') + '"></i>';
+    h += '</span>';
+    const extra = ok + pd - t; if(extra > 0) h += '<span class="over">+' + extra + '</span>';
+    return h;
+  }
+  const a = Math.min(ok/t, 1)*100, b = Math.min(pd/t, 1 - a/100)*100;
+  return '<span class="bigc"><b>' + nf(ok) + '</b>/' + nf(t) + '</span><span class="mini"><i class="a" style="width:' + a + '%"></i><i class="p" style="width:' + b + '%"></i></span>';
+}
+function sbarHTML(t, ok, pd){
+  if(!t) return '<span class="sbar"></span>';
+  const a = Math.min(ok/t,1)*100, b = Math.max(0, Math.min(pd/t*100, 100 - a));
+  return '<span class="sbar" role="img" aria-label="ยืนยันแล้ว ' + ok + ' รอตรวจสอบ ' + pd + ' จากเป้าหมาย ' + t + '"><i class="a" style="width:' + a + '%"></i><i class="p" style="width:' + b + '%"></i></span>';
+}
+const chip = s => '<span class="chip c-' + s.k + '">' + esc(s.l) + '</span>';
+const ICONS = {
+  overview:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
+  project:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h11l5 5v11H4z"/><path d="M15 4v5h5M8 13h8M8 17h5"/></svg>',
+  intake:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 13l2.5-8h11L20 13v6H4z"/><path d="M4 13h5l1 2h4l1-2h5"/></svg>',
+  register:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>',
+  settings:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>'
+};
+const NAV = [['overview','ภาพรวม','ภาพรวม'],['project','รายโครงการ','โครงการ'],['intake','รับรายงาน','รับรายงาน'],['register','ทะเบียนผลงาน','ทะเบียน'],['settings','ตั้งค่าและข้อมูล','ตั้งค่า']];
+
+function renderNav(){
+  const pc = pendingCount();
+  $('#nav').innerHTML = NAV.map(([v,l]) => '<button type="button" data-go="' + v + '"' + (UI.view === v ? ' aria-current="page"' : '') + '>' + ICONS[v] + '<span>' + l + '</span>' + (v === 'register' && pc ? '<span class="count" title="รอตรวจสอบ">' + pc + '</span>' : '') + '</button>').join('');
+  $('#tabbar').innerHTML = NAV.map(([v,,s]) => '<button type="button" data-go="' + v + '"' + (UI.view === v ? ' aria-current="page"' : '') + '>' + ICONS[v] + '<span>' + s + '</span>' + (v === 'register' && pc ? '<span class="count">' + pc + '</span>' : '') + '</button>').join('');
+}
+function renderSaved(){
+  const el = $('#savedAt'); if(!el) return;
+  el.textContent = S && S.savedAt ? 'บันทึกล่าสุด ' + new Date(S.savedAt).toLocaleString('th-TH',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : 'ยังไม่มีการบันทึก';
+}
+function renderDemoBar(){
+  $('#demoBar').innerHTML = MODE === 'demo'
+    ? '<div class="demo-bar"><span><b>ข้อมูลตัวอย่าง</b> ความคืบหน้าและวันที่สัญญาในหน้านี้สุ่มขึ้นเพื่อดูหน้าจอ ไม่ใช่ผลงานจริงของโครงการ (เป้าหมายมาจากไฟล์ KR_Global)</span><button class="btn sm" type="button" data-act="mode-real">ใช้ข้อมูลจริง</button></div>'
+    : '';
+}
+
+/* ---------- views ---------- */
+function yearBar(){
+  if(UI.view === 'settings') return '';
+  return '<div class="yearbar"><span class="yl">ปีงบประมาณ</span><div class="chips" role="group" aria-label="เลือกปีงบประมาณ">' +
+    '<button type="button" data-fy="all" aria-pressed="' + (UI.fy === 'all') + '">ทุกปี <span class="cnt">' + S.projects.length + '</span></button>' +
+    years().map(y => { const n = S.projects.filter(p => p.fy === y).length;
+      return '<button type="button" data-fy="' + y + '" aria-pressed="' + (UI.fy === y) + '"' + (n ? '' : ' class="nodata" title="ยังไม่มีข้อมูลปีนี้"') + '>' + y + ' <span class="cnt">' + n + '</span></button>'; }).join('') +
+    '</div><span class="sp"></span><button class="btn ghost sm" type="button" data-act="import-xlsx">นำเข้าปีอื่นจาก Excel</button></div>';
+}
+function emptyYear(){
+  return '<section class="panel"><div class="empty-year"><h2>ยังไม่มีโครงการ' + (UI.fy === 'all' ? '' : 'ปีงบประมาณ ' + UI.fy) + '</h2>' +
+    '<p>นำเข้าเป้าหมายจากไฟล์ Excel รูปแบบเดียวกับชีต Output_68 ระบบจะอ่านเลขที่สัญญา ข้อมูลโครงการ และเป้าหมาย Output/Outcome ให้เอง ถ้ายังไม่มีไฟล์ ดาวน์โหลดแบบฟอร์มเปล่าไปกรอกก่อนได้</p>' +
+    '<div class="row-btns"><button class="btn pri" type="button" data-act="import-xlsx">นำเข้าจาก Excel</button><button class="btn" type="button" data-act="template-xlsx">ดาวน์โหลดแบบฟอร์ม Excel</button><button class="btn" type="button" data-act="add-project">เพิ่มทีละโครงการ</button></div></div></section>';
+}
+function vOverview(){
+  const kind = UI.ovKind, items = itemsOf(kind);
+  const PS = scope();
+  const label = kind === 'oc' ? 'ผลลัพธ์' : 'ผลผลิต';
+  const head = '<div class="page-head"><div><h1>' + label + 'โครงการ Global Partnership ' + fyLabel() + '</h1>' +
+    '<p class="lede">' + (PS.length ? PS.length + ' โครงการ ภายใต้ ' + programs().length + ' โปรแกรมความร่วมมือ' : 'ยังไม่มีข้อมูลโครงการในปีนี้') + (PS.length ? ' เป้าหมายตามสัญญาเทียบกับผลงานที่โครงการรายงานเข้ามา' : '') + '</p></div>' +
+    '<div class="seg" role="group" aria-label="ประเภทตัวชี้วัด"><button type="button" data-ovkind="out" aria-pressed="' + (kind === 'out') + '">ผลผลิต (Output) 10</button><button type="button" data-ovkind="oc" aria-pressed="' + (kind === 'oc') + '">ผลลัพธ์ (Outcome) 14</button></div></div>';
+  if(!PS.length) return head + emptyYear();
+  let cells = 0, done = 0;
+  PS.forEach(p => items.forEach(it => { const t = target(p, kind, it.id); if(!t) return; cells++; if(got(p.id, kind, it.id).ok >= t) done++; }));
+  const pend = S.entries.filter(e => e.status !== 'ok' && e.kind === kind).reduce((a,e) => a + (+e.qty||0), 0);
+  const watch = PS.map(p => ({p, s:status(p), c:completion(p)})).filter(x => x.s.k === 'risk' || x.s.k === 'late')
+    .sort((a,b) => (a.s.k === 'late' ? -1 : 0) - (b.s.k === 'late' ? -1 : 0) || (daysLeft(a.p) - daysLeft(b.p)));
+  const nodate = PS.filter(p => !p.end).length;
+  let h = head;
+
+  h += '<p class="status-line">ส่งมอบครบตามเป้าแล้ว <b class="k-ok">' + nf(done) + '</b> จาก <b>' + nf(cells) + '</b> ' + label + 'ที่ต้องส่งมอบ' +
+    (pend ? ' มีผลงาน <b class="k-pend">' + nf(pend) + '</b> หน่วยรอนักวิเคราะห์ตรวจสอบ' : ' ไม่มีผลงานค้างตรวจสอบ') +
+    (kind === 'out' ? (watch.length ? ' และ <b class="k-risk">' + watch.length + '</b> โครงการต้องติดตามใกล้ชิด' : '') : '') + '</p>';
+
+  // summary per item
+  h += '<div class="ov-top"><section class="panel"><div class="panel-h"><h2>' + label + 'รวมทุกโครงการ</h2><div class="legend"><span><span class="sbar" style="width:18px"><i class="a" style="width:100%"></i></span>ยืนยันแล้ว</span><span><span class="sbar" style="width:18px"><i class="p" style="width:100%"></i></span>รอตรวจสอบ</span><span><span class="sbar" style="width:18px"></span>ยังไม่ได้</span></div></div><div class="panel-b osum">';
+  items.forEach(it => {
+    let t = 0, ok = 0, pd = 0, np = 0;
+    PS.forEach(p => { const tt = target(p, kind, it.id); if(tt) np++; t += tt; const g = got(p.id, kind, it.id); ok += Math.min(g.ok, tt || g.ok); pd += Math.min(g.pd, Math.max(0, (tt||0) - Math.min(g.ok, tt))); });
+    const kr = kind === 'out' && S.kr[it.id] && S.kr[it.id].code ? '<span class="kr-tag">' + esc(S.kr[it.id].code) + '</span>' : '';
+    if(!t) h += '<div class="osum-row zero"><span class="no">' + it.no + '</span><span class="nm" title="' + esc(it.name) + '">' + esc(it.short) + kr + '</span><span class="small">ไม่มีโครงการตั้งเป้าในปีนี้</span><span class="ct">–</span></div>';
+    else h += '<button type="button" class="osum-row' + (UI.hi === it.id ? ' on' : '') + '" aria-pressed="' + (UI.hi === it.id) + '" data-filter-item="' + it.id + '" title="' + esc(it.name) + ' (' + np + ' โครงการตั้งเป้า)"><span class="no">' + it.no + '</span><span class="nm">' + esc(it.short) + kr + '</span>' + sbarHTML(t, ok, pd) + '<span class="ct"><b>' + nf(ok) + '</b>/' + nf(t) + '</span></button>';
+  });
+  h += '</div></section>';
+
+  // watch list
+  h += '<section class="panel"><div class="panel-h"><h2>โครงการที่ต้องติดตาม</h2><span class="small muted">เทียบเวลาที่ผ่านไปกับผลผลิตที่ได้</span></div><div class="panel-b">';
+  if(watch.length){ h += '<div class="watch">' + watch.slice(0,6).map(x => { const d = daysLeft(x.p);
+      return '<button type="button" class="watch-row" data-open="' + x.p.id + '"><span class="t">' + esc(x.p.th) + '</span><span class="m">' + esc(x.p.contract) + ' ผลผลิต ' + pct(x.c.frac) + ' เวลาผ่านไป ' + pct(timeFrac(x.p)) + ' ' + (d < 0 ? 'สิ้นสุดแล้ว ' + nf(-d) + ' วัน' : 'เหลือ ' + nf(d) + ' วัน') + '</span>' + chip(x.s) + '</button>'; }).join('') + '</div>';
+    if(watch.length > 6) h += '<p class="small muted">และอีก ' + (watch.length - 6) + ' โครงการ ดูได้ในตารางด้านล่าง</p>';
+  } else h += '<p class="empty-note">' + (nodate === PS.length ? 'ยังคำนวณความเสี่ยงไม่ได้ เพราะยังไม่มีวันสิ้นสุดสัญญา เพิ่มวันที่ได้ที่หน้ารายโครงการ' : 'ทุกโครงการที่มีวันสิ้นสุดสัญญาเป็นไปตามแผน') + '</p>';
+  if(nodate && nodate < PS.length) h += '<p class="small muted">' + nodate + ' โครงการยังไม่ระบุวันสิ้นสุดสัญญา จึงยังไม่ถูกนำมาประเมิน</p>';
+  const krIds = Object.keys(S.kr).filter(k => S.kr[k] && S.kr[k].code);
+  krIds.forEach(id => { const it = itemDef('out', id); if(!it) return; let t = 0, ok = 0, np = 0, npok = 0;
+    PS.forEach(p => { const tt = target(p,'out',id); if(!tt) return; np++; t += tt; const g = got(p.id,'out',id).ok; ok += Math.min(g, tt); if(g > 0) npok++; });
+    h += '<div class="kr-box"><h3>' + esc(S.kr[id].code) + ' ผูกกับผลผลิตที่ ' + it.no + ' ' + esc(it.short) + '</h3><div class="kr-num"><b>' + nf(ok) + '</b><span class="muted">จากเป้าหมาย ' + nf(t) + ' ' + it.unit + ' (' + npok + '/' + np + ' โครงการรายงานแล้ว)</span></div>' + sbarHTML(t, ok, 0) + '<p class="small muted" style="margin:8px 0 0">' + esc(S.kr[id].text) + '</p></div>'; });
+  h += '</div></section></div>';
+
+  // matrix
+  const progs = programs();
+  h += '<section class="panel"><div class="toolbar"><h2 style="margin-right:6px">รายโครงการ</h2><div class="chips" role="group" aria-label="กรองตามโปรแกรม"><button type="button" data-prog="all" aria-pressed="' + (UI.prog === 'all') + '">ทุกโปรแกรม</button>' +
+    progs.map(g => '<button type="button" data-prog="' + esc(g) + '" aria-pressed="' + (UI.prog === g) + '">' + esc(g) + '</button>').join('') + '</div><span class="grow"></span>' +
+    '<input type="search" id="ovq" placeholder="ค้นหาชื่อ เลขสัญญา หัวหน้าโครงการ" value="' + esc(UI.q) + '" aria-label="ค้นหาโครงการ">' +
+    '<select id="ovsort" aria-label="เรียงลำดับ"><option value="seq">เรียงตามลำดับโครงการ</option><option value="low">ความคืบหน้าน้อยก่อน</option><option value="end">ใกล้สิ้นสุดสัญญาก่อน</option></select></div>';
+  h += '<div class="scroller"><table class="mx"><thead><tr><th class="pc" scope="col">โครงการ</th>' + items.map(it => '<th scope="col"' + (UI.hi === it.id ? ' class="hi"' : '') + ' title="' + esc(it.name) + '"><span class="n">' + it.no + '</span>' + esc(it.short) + '</th>').join('') + '<th scope="col" style="text-align:left">ภาพรวม</th></tr></thead><tbody>';
+  const q = UI.q.trim().toLowerCase();
+  let rows = PS.filter(p => (UI.prog === 'all' || p.program === UI.prog) && (!q || (p.th + ' ' + p.en + ' ' + p.contract + ' ' + p.pi + ' ' + p.inst).toLowerCase().includes(q)));
+  const grouped = UI.sort === 'seq';
+  if(grouped) rows = rows.slice().sort((a,b) => a.fy - b.fy || progOrder(a) - progOrder(b) || a.seq - b.seq);
+  if(UI.sort === 'low') rows.sort((a,b) => (completion(a,kind).frac ?? 2) - (completion(b,kind).frac ?? 2));
+  if(UI.sort === 'end') rows.sort((a,b) => (daysLeft(a) ?? 1e9) - (daysLeft(b) ?? 1e9));
+  let lastProg = null;
+  rows.forEach(p => {
+    const gk = p.fy + '|' + p.program;
+    if(grouped && gk !== lastProg){ lastProg = gk; h += '<tr class="grp"><td colspan="' + (items.length + 2) + '">' + (UI.fy === 'all' ? 'ปี ' + p.fy + ', ' : '') + esc(p.program) + '<span>' + PS.filter(x => x.fy === p.fy && x.program === p.program).length + ' โครงการ</span></td></tr>'; }
+    const c = completion(p, kind), tf = timeFrac(p), st = status(p);
+    h += '<tr class="pr" data-open="' + p.id + '"><td class="pc"><div class="ct"><span>' + p.seq + '.</span><span>' + esc(p.contract) + '</span>' + (UI.fy === 'all' ? '<span>ปี ' + p.fy + '</span>' : '') + '</div><div class="tt">' + esc(p.th.replace(/^โครงการ/, '')) + '</div><div class="pi">' + esc(p.pi) + '</div></td>';
+    items.forEach(it => { const t = target(p, kind, it.id), g = got(p.id, kind, it.id);
+      h += '<td class="cell' + (UI.hi === it.id ? ' hi' : '') + '">' + (t || g.ok + g.pd ? '<button type="button" data-open="' + p.id + '" data-item="' + it.id + '" aria-label="' + esc(it.short) + ' ได้ ' + g.ok + ' จาก ' + t + (g.pd ? ' รอตรวจสอบ ' + g.pd : '') + '" title="' + esc(it.short) + ': ยืนยัน ' + g.ok + ' / เป้า ' + t + (g.pd ? ' (รอตรวจสอบ ' + g.pd + ')' : '') + '">' + pipsHTML(t, g.ok, g.pd) + '</button>' : pipsHTML(0,0,0)) + '</td>'; });
+    h += '<td class="end"><div class="endcell">' + (kind === 'out' ? chip(st) : '') + '<div class="duo"><span>' + label + '</span><span class="bar o"><i style="width:' + ((c.frac||0)*100) + '%"></i></span><span class="v">' + pct(c.frac) + '</span>' +
+      (tf != null ? '<span>เวลา</span><span class="bar t"><i style="width:' + (tf*100) + '%"></i></span><span class="v">' + pct(tf) + '</span>' : '') + '</div></div></td></tr>';
+  });
+  if(!rows.length) h += '<tr><td colspan="' + (items.length + 2) + '" class="empty-note" style="padding:24px">ไม่พบโครงการที่ตรงกับคำค้น ลองล้างตัวกรองโปรแกรมหรือคำค้นหา</td></tr>';
+  h += '</tbody></table></div><div class="panel-b"><div class="legend"><span><i class="pip a"></i>ยืนยันแล้ว</span><span><i class="pip p"></i>รอตรวจสอบ</span><span><i class="pip"></i>ยังไม่ได้รับ</span><span>เป้าเกิน 10 หน่วยแสดงเป็นตัวเลขแทนจุด</span><span>– ไม่มีเป้าหมาย</span></div></div></section>';
+  return h;
+}
+
+function vProject(){
+  fixPid(); const PS = scope();
+  if(!PS.length) return emptyYear();
+  const p = P(UI.pid);
+  const idx = PS.indexOf(p), c = completion(p), tf = timeFrac(p), st = status(p), d = daysLeft(p);
+  let h = '<div class="picker"><button class="btn sm" type="button" data-nav-p="-1" ' + (idx === 0 ? 'disabled' : '') + ' aria-label="โครงการก่อนหน้า">‹</button><select id="pselect" aria-label="เลือกโครงการ">' +
+    PS.map(x => '<option value="' + x.id + '"' + (x.id === p.id ? ' selected' : '') + '>' + (UI.fy === 'all' ? x.fy + ' ' : '') + x.seq + '. ' + esc(x.contract) + ' ' + esc(x.th.replace(/^โครงการ/, '').slice(0, 70)) + '</option>').join('') +
+    '</select><button class="btn sm" type="button" data-nav-p="1" ' + (idx === PS.length - 1 ? 'disabled' : '') + ' aria-label="โครงการถัดไป">›</button><span style="flex:1"></span><button class="btn sm" type="button" data-act="add-project">เพิ่มโครงการ</button></div>';
+  const incash = [p.inGBP ? nf(p.inGBP) + ' GBP' : '', p.inJPY ? nf(p.inJPY) + ' JPY' : '', p.inPHP ? nf(Math.round(p.inPHP)) + ' PHP' : ''].filter(Boolean).join(', ');
+  h += '<section class="panel proj-head"><div class="tags"><span class="prog-tag">' + esc(p.program) + '</span><span>ปีงบประมาณ ' + p.fy + '</span><span>สัญญา ' + esc(p.contract) + '</span>' + chip(st) + '<span style="flex:1"></span><button class="btn ghost sm" type="button" data-act="edit-project">แก้ไขข้อมูลโครงการ</button></div>' +
+    '<h1>' + esc(p.th) + '</h1><p class="en">' + esc(p.en) + '</p>' +
+    '<dl class="facts"><div><dt>หัวหน้าโครงการ</dt><dd>' + esc(p.pi) + '</dd></div><div><dt>สถาบัน</dt><dd>' + esc(p.inst) + '</dd></div>' +
+    '<div><dt>งบประมาณฝั่งไทย (บพค.)</dt><dd>' + money(p.budget) + '</dd></div><div><dt>In-cash จากต่างประเทศ</dt><dd>' + (p.inTHB ? money(p.inTHB) + '<div class="small muted">' + incash + '</div>' : '<span class="muted">ไม่มีข้อมูลในไฟล์</span>') + '</dd></div>' +
+    '<div><dt>ระยะเวลา</dt><dd>' + (p.years || '–') + ' ปี</dd></div><div><dt>หน่วยงานร่วม</dt><dd>ไทย ' + (p.thInst||0) + ', เอกชน ' + (p.priv||0) + ', ต่างประเทศ ' + (p.foreign||0) + '</dd></div>' +
+    '<div><dt>วันเริ่ม–สิ้นสุดสัญญา</dt><dd>' + (p.start || p.end ? fmtD(p.start) + ' ถึง ' + fmtD(p.end) : '<span class="muted">ยังไม่ระบุ</span>') + '</dd></div><div><dt>ผลผลิตครบแล้ว</dt><dd>' + c.done + ' จาก ' + c.n + ' ประเภท</dd></div></dl>';
+  h += '<div class="timebox">' + (tf != null
+      ? '<div class="tl"><span>เวลาที่ผ่านไป</span><span class="bar t"><i style="width:' + tf*100 + '%"></i></span><span class="v">' + pct(tf) + '</span><span>ผลผลิตที่ได้</span><span class="bar o"><i style="width:' + (c.frac||0)*100 + '%"></i></span><span class="v">' + pct(c.frac) + '</span></div><div class="small muted">' + (d < 0 ? 'สิ้นสุดสัญญาแล้ว ' + nf(-d) + ' วัน' : 'เหลือเวลา ' + nf(d) + ' วัน') + '<br><button class="btn ghost sm" type="button" data-act="edit-contract">แก้ไขวันที่สัญญา</button></div>'
+      : '<div class="small">ระบุวันเริ่มและสิ้นสุดสัญญา เพื่อให้ระบบเทียบเวลาที่ผ่านไปกับผลผลิตที่ได้ และเตือนเมื่อใกล้สิ้นสุดโครงการ</div><button class="btn sm" type="button" data-act="edit-contract">ระบุวันที่สัญญา</button>') + '</div></section>';
+
+  const kind = UI.ptab;
+  h += '<div class="tabs" role="tablist"><button type="button" role="tab" data-ptab="out" aria-selected="' + (kind === 'out') + '">ผลผลิต (Output)</button><button type="button" role="tab" data-ptab="oc" aria-selected="' + (kind === 'oc') + '">ผลลัพธ์ (Outcome)</button><span class="sp"></span>' +
+    '<button class="btn ghost sm" type="button" data-act="edit-targets">แก้ไขเป้าหมาย</button><button class="btn ghost sm" type="button" data-act="intake-this">รับรายงานของโครงการนี้</button></div>';
+  h += '<section class="panel" style="border-top-left-radius:0;border-top-right-radius:0;border-top:0"><div class="panel-b items">';
+  itemsOf(kind).forEach(it => {
+    const t = target(p, kind, it.id), g = got(p.id, kind, it.id);
+    const evs = S.entries.filter(e => e.pid === p.id && e.kind === kind && e.item === it.id).sort((a,b) => (b.date||'').localeCompare(a.date||''));
+    const kr = kind === 'out' && S.kr[it.id] && S.kr[it.id].code ? '<span class="kr-tag">' + esc(S.kr[it.id].code) + '</span>' : '';
+    h += '<div class="item' + (t ? '' : ' zero') + '" id="it-' + it.id + '"><div class="item-h"><span class="no">' + it.no + '</span><div class="nm">' + esc(it.name) + kr + (t ? '' : '<small>ไม่มีเป้าหมายตามสัญญา</small>') + '</div>' +
+      '<div class="ibar">' + (t ? sbarHTML(t, g.ok, g.pd) : '') + '</div><div class="icount">' + (t || g.ok ? '<b>' + nf(g.ok) + '</b> / ' + nf(t) + ' ' + (it.unit || '') + (g.pd ? '<br><span style="color:var(--pend)">รอตรวจสอบ ' + nf(g.pd) + '</span>' : '') : '') + '</div>' +
+      '<button class="btn sm add" type="button" data-add="' + it.id + '">+ บันทึกผลงาน</button></div>';
+    if(kind === 'out' && it.id === 'O1' && t){
+      h += '<div class="subs">' + O1_SUBS.map(sb => { const ts = target(p,'out','O1',sb.id), gs = got(p.id,'out','O1',sb.id);
+        return '<div class="sub"><span>' + esc(sb.name) + '</span><span class="ibar">' + (ts ? sbarHTML(ts, gs.ok, gs.pd) : '') + '</span><span style="text-align:right">' + (ts || gs.ok ? nf(gs.ok) + ' / ' + nf(ts) + ' คน' : '<span class="muted">ไม่มีเป้า</span>') + '</span></div>'; }).join('') + '</div>';
+    }
+    if(evs.length){ const open = UI.openEv && UI.openEv[p.id + it.id]; const shown = open ? evs : evs.slice(0, 3);
+      h += '<ul class="evs">' + shown.map(evHTML).join('') + '</ul>';
+      if(evs.length > 3) h += '<button class="btn ghost sm more" type="button" data-more="' + it.id + '">' + (open ? 'ย่อรายการ' : 'ดูอีก ' + (evs.length - 3) + ' รายการ') + '</button>'; }
+    h += '</div>';
+  });
+  h += '</div></section>';
+  if(p.targetLog && p.targetLog.length) h += '<section class="panel" style="margin-top:18px"><div class="panel-h"><h2>ประวัติการแก้ไขเป้าหมาย</h2></div><div class="panel-b">' + p.targetLog.slice().reverse().map(l => '<p class="small" style="margin:0 0 8px"><b>' + new Date(l.at).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}) + '</b> ' + esc(l.by) + ': ' + esc(l.reason || 'ไม่ระบุเหตุผล') + '<br><span class="muted">' + esc(l.diff) + '</span></p>').join('') + '</div></section>';
+  return h;
+}
+function evHTML(e){
+  const flds = (FIELDS[e.item] || []).map(f => e.f && e.f[f.k] ? f.l + ': ' + e.f[f.k] : '').filter(Boolean);
+  const sub = e.sub ? O1_SUBS.find(s => s.id === e.sub).short : '';
+  return '<li class="ev' + (e.status === 'ok' ? '' : ' pend') + '"><span class="chip c-' + (e.status === 'ok' ? 'ok' : 'pend') + '">' + (e.status === 'ok' ? 'ยืนยัน' : 'รอตรวจ') + '</span><div><div class="tt">' + esc(e.title || 'ไม่ระบุชื่อรายการ') + (e.qty > 1 ? ' <span class="muted">× ' + e.qty + '</span>' : '') + '</div>' +
+    '<div class="meta">' + [sub, esc(e.round), fmtD(e.date)].filter(Boolean).join(', ') + (flds.length ? '<br>' + esc(flds.join(', ')) : '') + (e.link ? '<br><a href="' + esc(e.link) + '" target="_blank" rel="noopener">เปิดหลักฐาน</a>' : '') + (e.note ? '<br>' + esc(e.note) : '') + '</div></div>' +
+    '<div class="acts">' + (e.status === 'ok' ? '' : '<button class="btn ghost sm" type="button" data-confirm="' + e.id + '">ยืนยัน</button>') + '<button class="btn ghost sm" type="button" data-edit="' + e.id + '">แก้ไข</button></div></li>';
+}
+
+function vIntake(){
+  const I = UI.intake; const p = P(I.pid);
+  if(!scope().length) return '<div class="page-head"><div><h1>รับรายงานจากโครงการ</h1></div></div>' + emptyYear();
+  let h = '<div class="page-head"><div><h1>รับรายงานจากโครงการ</h1><p class="lede">เมื่อโครงการส่งรายงานความก้าวหน้าหรือรายงานฉบับสมบูรณ์ กรอกจำนวนที่โครงการรายงานในรอบนี้ ผลงานจะเข้าทะเบียนในสถานะรอตรวจสอบ จนกว่าจะยืนยันหลักฐาน</p></div></div>';
+  h += '<section class="panel"><div class="intake-meta"><label class="f">โครงการ<select id="in-pid"><option value="">เลือกโครงการ</option>' + scope().map(x => '<option value="' + x.id + '"' + (x.id === I.pid ? ' selected' : '') + '>' + (UI.fy === 'all' ? x.fy + ' ' : '') + x.seq + '. ' + esc(x.contract) + ' ' + esc(x.th.replace(/^โครงการ/, '').slice(0,60)) + '</option>').join('') + '</select></label>' +
+    '<label class="f">รอบรายงาน<select id="in-round">' + ROUNDS.map(r => '<option' + (r === I.round ? ' selected' : '') + '>' + r + '</option>').join('') + '</select></label>' +
+    '<label class="f">วันที่ได้รับรายงาน<input type="date" id="in-date" value="' + esc(I.date || isoD(TODAY)) + '"></label>' +
+    '<label class="f">เลขที่หนังสือ/อ้างอิง<input type="text" id="in-doc" value="' + esc(I.doc) + '" placeholder="ไม่บังคับ"></label></div>';
+  if(!p){ h += '<div class="panel-b" style="border-top:1px solid var(--line2)"><p class="empty-note">เลือกโครงการเพื่อเริ่มกรอกผลงานที่รายงานในรอบนี้</p></div></section>'; return h; }
+  const kind = I.kind, items = itemsOf(kind).filter(it => I.all || target(p, kind, it.id) > 0);
+  h += '<div class="toolbar" style="border-top:1px solid var(--line);border-bottom:0"><div class="seg" role="group"><button type="button" data-inkind="out" aria-pressed="' + (kind === 'out') + '">ผลผลิต (Output)</button><button type="button" data-inkind="oc" aria-pressed="' + (kind === 'oc') + '">ผลลัพธ์ (Outcome)</button></div>' +
+    '<label class="small" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="in-all"' + (I.all ? ' checked' : '') + '> แสดงรายการที่ไม่มีเป้าหมายด้วย</label></div>';
+  h += '<div class="irow head"><span></span><span>รายการ</span><span style="text-align:right">เป้าหมาย</span><span style="text-align:right">ยืนยันแล้ว</span><span>รายงานรอบนี้</span><span>รายละเอียด (1 บรรทัดต่อ 1 ชิ้นงาน)</span></div>';
+  items.forEach(it => {
+    const t = target(p, kind, it.id), g = got(p.id, kind, it.id);
+    h += '<div class="irow' + (t ? '' : ' zero') + '" data-row="' + it.id + '"><span class="no">' + it.no + '</span><span class="nm">' + esc(kind === 'out' ? it.name : it.short) + '</span><span class="num">' + (t ? nf(t) : '–') + '</span><span class="num d">' + nf(g.ok) + (g.pd ? ' <span style="color:var(--pend)">(+' + g.pd + ')</span>' : '') + '</span>';
+    if(kind === 'out' && it.id === 'O1') h += '<span class="qty o1" data-l="จำนวนที่รายงานรอบนี้">' + O1_SUBS.map(sb => '<label>' + esc(sb.tiny) + '<input type="number" min="0" step="1" inputmode="numeric" data-q="' + it.id + '" data-sub="' + sb.id + '" aria-label="' + esc(sb.name) + ' รอบนี้"></label>').join('') + '</span>';
+    else h += '<span class="qty" data-l="จำนวนที่รายงานรอบนี้"><input type="number" min="0" step="1" inputmode="numeric" data-q="' + it.id + '" aria-label="' + esc(it.short) + ' รอบนี้"></span>';
+    h += '<span class="det"><textarea rows="1" data-d="' + it.id + '" placeholder="' + esc(kind === 'out' ? (TITLE_LABEL[it.id][1] || TITLE_LABEL[it.id][0]) : 'รายละเอียด') + '" aria-label="รายละเอียด ' + esc(it.short) + '"></textarea></span></div>';
+  });
+  h += '<div class="intake-foot"><span class="small muted" id="in-sum">ยังไม่ได้กรอกจำนวน</span><div class="row-btns"><button class="btn" type="button" data-act="intake-clear">ล้างแบบฟอร์ม</button><button class="btn pri" type="button" data-act="intake-save">บันทึกเข้าทะเบียน</button></div></div></section>';
+  return h;
+}
+
+function vRegister(){
+  const R = UI.reg; const q = R.q.trim().toLowerCase();
+  const ids = new Set(scope().map(p => p.id));
+  let list = S.entries.filter(e => ids.has(e.pid) && (!R.pid || e.pid === R.pid) && (!R.item || e.kind + ':' + e.item === R.item) && (!R.status || e.status === R.status) && (!R.round || e.round === R.round) &&
+    (!q || ((e.title||'') + ' ' + (e.note||'') + ' ' + JSON.stringify(e.f||{}) + ' ' + (P(e.pid)||{}).contract).toLowerCase().includes(q)));
+  list.sort((a,b) => (a.status === 'ok') - (b.status === 'ok') || (b.date||'').localeCompare(a.date||''));
+  const pend = list.filter(e => e.status !== 'ok');
+  let h = '<div class="page-head"><div><h1>ทะเบียนผลงาน</h1><p class="lede">ทุกชิ้นงานที่โครงการรายงาน ตรวจหลักฐานแล้วกดยืนยัน จึงจะนับเป็นผลผลิตที่ได้</p></div><div class="row-btns"><button class="btn" type="button" data-act="csv-entries">ส่งออก CSV</button></div></div>';
+  h += '<section class="panel"><div class="toolbar"><input type="search" id="rg-q" placeholder="ค้นหาชื่อผลงาน หมายเหตุ เลขสัญญา" value="' + esc(R.q) + '" aria-label="ค้นหาผลงาน">' +
+    '<select id="rg-pid" aria-label="โครงการ"><option value="">ทุกโครงการ</option>' + scope().map(p => '<option value="' + p.id + '"' + (R.pid === p.id ? ' selected' : '') + '>' + (UI.fy === 'all' ? p.fy + ' ' : '') + p.seq + '. ' + esc(p.contract) + '</option>').join('') + '</select>' +
+    '<select id="rg-item" aria-label="ประเภท"><option value="">ทุกประเภท</option><optgroup label="ผลผลิต">' + OUTPUTS.map(o => '<option value="out:' + o.id + '"' + (R.item === 'out:' + o.id ? ' selected' : '') + '>' + o.no + '. ' + esc(o.short) + '</option>').join('') + '</optgroup><optgroup label="ผลลัพธ์">' + OUTCOMES.map(o => '<option value="oc:' + o.id + '"' + (R.item === 'oc:' + o.id ? ' selected' : '') + '>' + o.no + '. ' + esc(o.short) + '</option>').join('') + '</optgroup></select>' +
+    '<select id="rg-status" aria-label="สถานะ"><option value="">ทุกสถานะ</option><option value="pending"' + (R.status === 'pending' ? ' selected' : '') + '>รอตรวจสอบ</option><option value="ok"' + (R.status === 'ok' ? ' selected' : '') + '>ยืนยันแล้ว</option></select>' +
+    '<select id="rg-round" aria-label="รอบรายงาน"><option value="">ทุกรอบรายงาน</option>' + ROUNDS.map(r => '<option' + (R.round === r ? ' selected' : '') + '>' + r + '</option>').join('') + '</select></div>';
+  if(pend.length) h += '<div class="bulk"><span>รอตรวจสอบ ' + pend.length + ' รายการในผลการค้นหานี้</span><button class="btn ok sm" type="button" data-act="confirm-all">ยืนยันทั้งหมด ' + pend.length + ' รายการ</button></div>';
+  h += '<div class="scroller"><table class="rg"><thead><tr><th>วันที่</th><th>โครงการ</th><th>ประเภท</th><th>ผลงาน</th><th style="text-align:right">จำนวน</th><th>รอบรายงาน</th><th>สถานะ</th><th></th></tr></thead><tbody>';
+  const show = list.slice(0, 300);
+  show.forEach(e => { const p = P(e.pid) || {}; const it = itemDef(e.kind, e.item) || {};
+    h += '<tr><td>' + fmtD(e.date) + '</td><td><button class="btn ghost sm" type="button" data-open="' + esc(e.pid) + '" style="padding:0">' + esc(p.contract) + '</button><div class="sub2">' + esc(p.program) + (UI.fy === 'all' ? ', ปี ' + p.fy : '') + '</div></td><td>' + (e.kind === 'oc' ? 'ผลลัพธ์ ' : 'ผลผลิต ') + it.no + '<div class="sub2">' + esc(it.short) + (e.sub ? ', ' + esc(O1_SUBS.find(s => s.id === e.sub).short) : '') + '</div></td>' +
+      '<td><div class="tt">' + esc(e.title || 'ไม่ระบุชื่อรายการ') + '</div>' + (e.link ? '<a class="small" href="' + esc(e.link) + '" target="_blank" rel="noopener">เปิดหลักฐาน</a>' : '<span class="sub2">ยังไม่แนบหลักฐาน</span>') + '</td><td class="q">' + nf(e.qty) + '</td><td class="small">' + esc(e.round) + '</td>' +
+      '<td><span class="chip c-' + (e.status === 'ok' ? 'ok' : 'pend') + '">' + (e.status === 'ok' ? 'ยืนยันแล้ว' : 'รอตรวจสอบ') + '</span></td><td style="white-space:nowrap">' + (e.status === 'ok' ? '' : '<button class="btn ghost sm" type="button" data-confirm="' + e.id + '">ยืนยัน</button>') + '<button class="btn ghost sm" type="button" data-edit="' + e.id + '">แก้ไข</button></td></tr>'; });
+  if(!list.length) h += '<tr><td colspan="8" class="empty-note" style="padding:28px 12px">' + (S.entries.length ? 'ไม่พบผลงานตามตัวกรองนี้' : 'ยังไม่มีผลงานในทะเบียน เริ่มจากเมนูรับรายงาน เมื่อโครงการส่งรายงานเข้ามา') + '</td></tr>';
+  h += '</tbody></table></div>' + (list.length > 300 ? '<div class="panel-b small muted">แสดง 300 จาก ' + nf(list.length) + ' รายการ ใช้ตัวกรองเพื่อจำกัดผลลัพธ์</div>' : '<div class="panel-b small muted">' + nf(list.length) + ' รายการ</div>') + '</section>';
+  return h;
+}
+
+function vSettings(){
+  let h = '<div class="page-head"><div><h1>ตั้งค่าและข้อมูล</h1><p class="lede">ต้นแบบนี้เก็บข้อมูลไว้ในเบราว์เซอร์เครื่องนี้ ใช้ส่งออกไฟล์เพื่อสำรองหรือย้ายเครื่อง เมื่อรวมเข้า D3-One จะเปลี่ยนไปซิงก์ผ่านระบบกลาง</p></div></div><div class="set-grid">';
+  h += '<section class="panel"><div class="panel-h"><h2>ชุดข้อมูลที่ใช้อยู่</h2></div><div class="panel-b"><p>' + (MODE === 'demo' ? 'กำลังใช้ <b>ข้อมูลตัวอย่าง</b> สำหรับดูหน้าจอ การแก้ไขในโหมดนี้แยกจากข้อมูลจริง' : 'กำลังใช้ <b>ข้อมูลจริง</b> เป้าหมายจากไฟล์ KR_Global ชีต Output_68 และผลงานที่นักวิเคราะห์บันทึก') + '</p><div class="row-btns">' +
+    (MODE === 'demo' ? '<button class="btn pri" type="button" data-act="mode-real">ใช้ข้อมูลจริง</button><button class="btn" type="button" data-act="demo-regen">สุ่มข้อมูลตัวอย่างใหม่</button>' : '<button class="btn" type="button" data-act="mode-demo">ดูข้อมูลตัวอย่าง</button>') + '</div>' +
+    '<label class="f" style="margin-top:16px;max-width:320px">ชื่อนักวิเคราะห์ผู้บันทึก<input type="text" id="set-analyst" value="' + esc(S.analyst) + '"></label></div></section>';
+  h += '<section class="panel"><div class="panel-h"><h2>สำรองและนำเข้าข้อมูล</h2></div><div class="panel-b"><p>ไฟล์ JSON เก็บทุกอย่าง ทั้งเป้าหมาย วันที่สัญญา และทะเบียนผลงาน ส่วน CSV เปิดใน Excel ได้ทันที</p><div class="row-btns">' +
+    '<button class="btn" type="button" data-act="export-json">ส่งออก JSON</button><button class="btn" type="button" data-act="import-json">นำเข้า JSON</button><button class="btn" type="button" data-act="csv-matrix">ตารางสรุปแบบ Excel (CSV)</button><button class="btn" type="button" data-act="csv-entries">ทะเบียนผลงาน (CSV)</button></div>' +
+    '<input type="file" id="imp" accept="application/json,.json" hidden></div></section>';
+  h += '<section class="panel" style="grid-column:1/-1"><div class="panel-h"><h2>ปีงบประมาณและโครงการ</h2><span class="small muted">เพิ่มปีใหม่ด้วยไฟล์ Excel รูปแบบเดียวกับชีต Output_68 นำเข้าซ้ำได้ ระบบจะอัปเดตเป้าหมายและเก็บผลงานที่บันทึกไว้</span></div><div class="panel-b"><div class="yr-list">' +
+    years().map(y => { const ps = S.projects.filter(p => p.fy === y); const ne = S.entries.filter(e => ps.some(p => p.id === e.pid)).length;
+      return '<b>' + y + '</b><span>' + (ps.length ? ps.length + ' โครงการ, ' + new Set(ps.map(p => p.program)).size + ' โปรแกรม, ผลงาน ' + nf(ne) + ' รายการ' : '<span class="muted">ยังไม่มีข้อมูล</span>') + '</span><span class="row-btns">' +
+        (ps.length ? '<button class="btn ghost sm" type="button" data-fy="' + y + '" data-go="overview">ดูภาพรวม</button><button class="btn ghost sm danger" type="button" data-act="del-year" data-year="' + y + '">ลบทั้งปี</button>' : '') + '</span>'; }).join('') +
+    '</div><div class="row-btns"><button class="btn pri" type="button" data-act="import-xlsx">นำเข้าจาก Excel</button><button class="btn" type="button" data-act="template-xlsx">ดาวน์โหลดแบบฟอร์ม Excel เปล่า</button><button class="btn" type="button" data-act="add-project">เพิ่มทีละโครงการ</button></div></div></section>';
+  h += '<section class="panel" style="grid-column:1/-1"><div class="panel-h"><h2>การเชื่อมผลผลิตกับ KR</h2><span class="small muted">ผลผลิตที่ผูก KR จะแสดงป้ายและสรุปในหน้าภาพรวม</span></div><div class="panel-b"><div class="krmap">' +
+    OUTPUTS.map(o => { const k = S.kr[o.id] || {}; return '<span class="muted" style="text-align:right;font-weight:700">' + o.no + '</span><span>' + esc(o.name) + '</span><input type="text" data-krc="' + o.id + '" value="' + esc(k.code||'') + '" placeholder="รหัส KR" aria-label="รหัส KR ของ ' + esc(o.short) + '"><input type="text" data-krt="' + o.id + '" value="' + esc(k.text||'') + '" placeholder="คำอธิบาย KR" aria-label="คำอธิบาย KR ของ ' + esc(o.short) + '">'; }).join('') +
+    '</div><div class="row-btns" style="margin-top:14px"><button class="btn pri" type="button" data-act="save-kr">บันทึกการเชื่อม KR</button></div></div></section>';
+  h += '<section class="panel" style="grid-column:1/-1"><div class="panel-h"><h2>เริ่มต้นใหม่</h2></div><div class="panel-b"><p>ล้างทุกปีงบประมาณ ทะเบียนผลงาน และวันที่สัญญาของชุดข้อมูลที่ใช้อยู่ แล้วโหลดเป้าหมายปี 2568 จากไฟล์ KR_Global อีกครั้ง ส่งออก JSON เก็บไว้ก่อนหากต้องการย้อนกลับ</p><button class="btn danger" type="button" data-act="reset">ล้างและโหลดเป้าหมายจากไฟล์ใหม่</button></div></section>';
+  return h + '</div>';
+}
+
+function render(){
+  renderNav(); renderDemoBar(); renderSaved();
+  const v = UI.view;
+  $('#view').innerHTML = yearBar() + (v === 'project' ? vProject() : v === 'intake' ? vIntake() : v === 'register' ? vRegister() : v === 'settings' ? vSettings() : vOverview());
+  const so = $('#ovsort'); if(so) so.value = UI.sort;
+  if(v === 'intake') intakeSum();
+}
+function go(v, opts){ UI.view = v; Object.assign(UI, opts || {}); render(); window.scrollTo({top:0}); }
+function openProject(pid, item){
+  const pp = P(pid); if(pp && UI.fy !== 'all' && pp.fy !== UI.fy) UI.fy = pp.fy;
+  UI.view = 'project'; UI.pid = pid; if(item) UI.ptab = item.startsWith('C') ? 'oc' : 'out'; render();
+  if(item){ const el = document.getElementById('it-' + item); if(el){ el.scrollIntoView({block:'center'}); el.style.background = 'var(--primary-soft)'; setTimeout(() => el.style.background = '', 1200); } }
+  else window.scrollTo({top:0});
+}
+
+/* ---------- modal ---------- */
+let lastFocus = null;
+function openModal(html){ lastFocus = document.activeElement; $('#dialog').innerHTML = html; $('#modal').classList.add('open'); const f = $('#dialog').querySelector('input,select,textarea'); if(f) f.focus(); }
+function closeModal(){ $('#modal').classList.remove('open'); $('#dialog').innerHTML = ''; if(lastFocus && document.contains(lastFocus)) lastFocus.focus(); }
+
+function entryForm(e){
+  const isNew = !e.id; const kind = e.kind; const p = P(e.pid);
+  const opts = itemsOf(kind).map(it => '<option value="' + it.id + '"' + (it.id === e.item ? ' selected' : '') + '>' + it.no + '. ' + esc(it.short) + '</option>').join('');
+  const tl = kind === 'out' ? TITLE_LABEL[e.item] : ['ชื่อรายการ/รายละเอียด',''];
+  let h = '<div class="dialog-h"><div><h2>' + (isNew ? 'บันทึกผลงาน' : 'แก้ไขผลงาน') + '</h2><p>' + esc(p.contract) + ' ' + esc(p.th.replace(/^โครงการ/,'').slice(0,80)) + '</p></div><button class="x" type="button" data-act="close" aria-label="ปิด">×</button></div><form id="ef" class="dialog-b">';
+  h += '<label class="f">' + (kind === 'oc' ? 'ผลลัพธ์' : 'ผลผลิต') + '<select name="item" id="ef-item">' + opts + '</select></label>';
+  if(kind === 'out' && e.item === 'O1') h += '<label class="f">ระดับ<select name="sub">' + O1_SUBS.map(s => '<option value="' + s.id + '"' + (s.id === e.sub ? ' selected' : '') + '>' + esc(s.name) + '</option>').join('') + '</select></label>';
+  else h += '<label class="f">จำนวน<input type="number" name="qty" min="1" step="1" value="' + (e.qty || 1) + '"></label>';
+  if(kind === 'out' && e.item === 'O1') h += '<label class="f">จำนวน (คน)<input type="number" name="qty" min="1" step="1" value="' + (e.qty || 1) + '"></label>';
+  h += '<label class="f' + (kind === 'out' && e.item === 'O1' ? '' : ' full') + '">' + esc(tl[0]) + '<input type="text" name="title" value="' + esc(e.title) + '" placeholder="' + esc(tl[1]) + '"></label>';
+  if(kind === 'out') (FIELDS[e.item] || []).forEach(f => {
+    const v = (e.f || {})[f.k] || '';
+    h += '<label class="f">' + esc(f.l) + (f.opts ? '<select name="f_' + f.k + '"><option value="">ไม่ระบุ</option>' + f.opts.map(o => '<option' + (o === v ? ' selected' : '') + '>' + esc(o) + '</option>').join('') + '</select>' : '<input type="' + (f.type || 'text') + '" name="f_' + f.k + '" value="' + esc(v) + '">') + '</label>';
+  });
+  h += '<label class="f">รอบรายงาน<select name="round">' + ROUNDS.map(r => '<option' + (r === e.round ? ' selected' : '') + '>' + r + '</option>').join('') + '</select></label>';
+  h += '<label class="f">วันที่รายงาน<input type="date" name="date" value="' + esc(e.date || isoD(TODAY)) + '"></label>';
+  h += '<label class="f full">ลิงก์หลักฐาน<input type="url" name="link" value="' + esc(e.link) + '" placeholder="เช่น ลิงก์ไฟล์ใน Google Drive หรือ DOI"><span class="hint">ใส่ลิงก์ไฟล์ต้นฉบับ หนังสือตอบรับ หรือเอกสารคำขอ</span></label>';
+  h += '<label class="f full">หมายเหตุ<textarea name="note" rows="2">' + esc(e.note) + '</textarea></label>';
+  h += '<div class="f full"><span class="small" style="color:var(--ink2);font-weight:500">สถานะ</span><div class="radio"><label><input type="radio" name="status" value="pending"' + (e.status !== 'ok' ? ' checked' : '') + '> รอตรวจสอบ</label><label><input type="radio" name="status" value="ok"' + (e.status === 'ok' ? ' checked' : '') + '> ยืนยันแล้ว ตรวจหลักฐานครบ</label></div></div>';
+  h += '</form><div class="dialog-f">' + (isNew ? '' : '<button class="btn danger" type="button" data-act="entry-del">ลบผลงาน</button>') + '<div class="r"><button class="btn" type="button" data-act="close">ยกเลิก</button><button class="btn pri" type="button" data-act="entry-save">' + (isNew ? 'บันทึกผลงาน' : 'บันทึกการแก้ไข') + '</button></div></div>';
+  return h;
+}
+let EDIT = null;
+function openEntry(pid, kind, item, entry){
+  EDIT = entry ? JSON.parse(JSON.stringify(entry)) : {pid, kind, item, sub: item === 'O1' ? 'l' : null, qty:1, title:'', f:{}, round:ROUNDS[0], date:isoD(TODAY), link:'', note:'', status:'pending'};
+  openModal(entryForm(EDIT));
+}
+function readEntryForm(){
+  const fd = new FormData($('#ef')); const e = EDIT;
+  e.item = fd.get('item') || e.item; e.sub = e.kind === 'out' && e.item === 'O1' ? (fd.get('sub') || 'l') : null;
+  e.qty = Math.max(1, parseInt(fd.get('qty'), 10) || 1); e.title = (fd.get('title') || '').trim(); e.round = fd.get('round'); e.date = fd.get('date');
+  e.link = (fd.get('link') || '').trim(); e.note = (fd.get('note') || '').trim(); e.status = fd.get('status') === 'ok' ? 'ok' : 'pending';
+  const f = {}; for(const [k, v] of fd.entries()) if(k.startsWith('f_') && String(v).trim()) f[k.slice(2)] = String(v).trim(); e.f = f;
+  return e;
+}
+
+function targetsForm(p){
+  let h = '<div class="dialog-h"><div><h2>แก้ไขเป้าหมาย</h2><p>' + esc(p.contract) + ' ใช้เมื่อมีการแก้ไขสัญญาหรืออนุมัติปรับผลผลิต</p></div><button class="x" type="button" data-act="close" aria-label="ปิด">×</button></div><form id="tf" class="dialog-b"><div class="full tg-grid">';
+  h += '<span></span><b class="small">ผลผลิต (Output)</b><b class="small" style="text-align:right">เป้าหมาย</b>';
+  OUTPUTS.forEach(o => {
+    if(o.id === 'O1'){ h += '<span class="no">1</span><span>' + esc(o.name) + ' <span class="muted small">(รวมจาก 3 ระดับ)</span></span><span id="o1sum" style="text-align:right;font-weight:600">' + p.targets.O1.t + '</span>';
+      O1_SUBS.forEach(s => h += '<span></span><span class="ind">' + esc(s.name) + '</span><input type="number" min="0" name="O1_' + s.id + '" value="' + (p.targets.O1[s.id]||0) + '">'); return; }
+    h += '<span class="no">' + o.no + '</span><span>' + esc(o.name) + '</span><input type="number" min="0" name="' + o.id + '" value="' + (p.targets[o.id]||0) + '">';
+  });
+  h += '<span></span><b class="small" style="margin-top:10px">ผลลัพธ์ (Outcome)</b><span></span>';
+  OUTCOMES.forEach(o => h += '<span class="no">' + o.no + '</span><span>' + esc(o.short) + '</span><input type="number" min="0" name="' + o.id + '" value="' + (p.ocTargets[o.id]||0) + '">');
+  h += '</div><label class="f full">เหตุผลการแก้ไข<input type="text" name="reason" placeholder="เช่น ตามหนังสือขอปรับผลผลิต ลงวันที่ ..."></label></form><div class="dialog-f"><div class="r"><button class="btn" type="button" data-act="close">ยกเลิก</button><button class="btn pri" type="button" data-act="targets-save">บันทึกเป้าหมาย</button></div></div>';
+  return h;
+}
+function contractForm(p){
+  return '<div class="dialog-h"><div><h2>วันที่สัญญา</h2><p>' + esc(p.contract) + ' ระยะเวลาตามไฟล์ ' + (p.years||'–') + ' ปี</p></div><button class="x" type="button" data-act="close" aria-label="ปิด">×</button></div><form id="cf" class="dialog-b">' +
+    '<label class="f">วันเริ่มสัญญา<input type="date" name="start" value="' + esc(p.start) + '"></label><label class="f">วันสิ้นสุดสัญญา<input type="date" name="end" value="' + esc(p.end) + '"><span class="hint">ว่างไว้เพื่อคำนวณจากระยะเวลา ' + (p.years||'–') + ' ปี</span></label>' +
+    '<label class="f full">หมายเหตุ<input type="text" name="note" value="' + esc(p.note) + '" placeholder="เช่น ขยายระยะเวลาถึง ..."></label></form>' +
+    '<div class="dialog-f"><div class="r"><button class="btn" type="button" data-act="close">ยกเลิก</button><button class="btn pri" type="button" data-act="contract-save">บันทึกวันที่</button></div></div>';
+}
+
+/* ---------- intake logic ---------- */
+function intakeRead(){
+  const I = UI.intake; const p = P(I.pid); if(!p) return [];
+  const out = [];
+  document.querySelectorAll('[data-q]').forEach(inp => {
+    const n = parseInt(inp.value, 10); if(!(n > 0)) return;
+    const item = inp.dataset.q, sub = inp.dataset.sub || null;
+    const det = (document.querySelector('[data-d="' + item + '"]') || {}).value || '';
+    out.push({item, sub, n, det});
+  });
+  return out;
+}
+function intakeSum(){
+  const el = $('#in-sum'); if(!el) return; const rows = intakeRead();
+  const n = rows.reduce((a,r) => a + r.n, 0);
+  el.textContent = n ? 'จะบันทึก ' + nf(n) + ' หน่วย จาก ' + new Set(rows.map(r => r.item)).size + ' ประเภท ในสถานะรอตรวจสอบ' : 'ยังไม่ได้กรอกจำนวน';
+}
+function intakeSave(){
+  const I = UI.intake; const p = P(I.pid); if(!p){ toast('เลือกโครงการก่อนบันทึก'); return; }
+  I.round = $('#in-round').value; I.date = $('#in-date').value; I.doc = $('#in-doc').value.trim();
+  const rows = intakeRead(); if(!rows.length){ toast('กรอกจำนวนอย่างน้อย 1 รายการ'); return; }
+  let created = 0;
+  rows.forEach(r => {
+    const lines = r.det.split('\n').map(s => s.trim()).filter(Boolean);
+    const base = {pid:p.id, kind:I.kind, item:r.item, sub:r.sub, f:{}, round:I.round, date:I.date || isoD(TODAY), link:'', note:I.doc ? 'อ้างอิง ' + I.doc : '', status:'pending', by:S.analyst, at:new Date().toISOString()};
+    if(!r.sub && lines.length === r.n && r.n > 1) lines.forEach(l => { S.entries.push(Object.assign({}, base, {id:uid(), qty:1, title:l})); created++; });
+    else { S.entries.push(Object.assign({}, base, {id:uid(), qty:r.n, title:lines.join(', ')})); created++; }
+  });
+  save(); const n = rows.reduce((a,r) => a + r.n, 0);
+  I.doc = ''; render(); toast('บันทึกเข้าทะเบียนแล้ว ' + nf(n) + ' หน่วย (' + created + ' รายการ) รอตรวจสอบ');
+}
+
+/* ---------- export ---------- */
+function download(name, text, type){
+  const blob = new Blob([text], {type}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+const csvCell = v => { const s = String(v == null ? '' : v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+const csv = rows => '﻿' + rows.map(r => r.map(csvCell).join(',')).join('\r\n');
+function csvEntries(){
+  const rows = [['วันที่','ปีงบประมาณ','เลขที่สัญญา','โปรแกรม','กลุ่ม','ลำดับ','ประเภท','ระดับ','ผลงาน','จำนวน','รอบรายงาน','สถานะ','ลิงก์หลักฐาน','รายละเอียดเพิ่มเติม','หมายเหตุ','ผู้บันทึก']];
+  S.entries.forEach(e => { const p = P(e.pid) || {}; const it = itemDef(e.kind, e.item) || {};
+    rows.push([e.date, p.fy, p.contract, p.program, e.kind === 'oc' ? 'ผลลัพธ์' : 'ผลผลิต', it.no, it.name, e.sub ? O1_SUBS.find(s => s.id === e.sub).name : '', e.title, e.qty, e.round, e.status === 'ok' ? 'ยืนยันแล้ว' : 'รอตรวจสอบ', e.link,
+      Object.entries(e.f || {}).map(([k,v]) => k + '=' + v).join('; '), e.note, e.by]); });
+  download('ทะเบียนผลงาน_' + isoD(new Date()) + '.csv', csv(rows), 'text/csv;charset=utf-8');
+}
+function csvMatrix(){
+  const ps = scope(); const rows = [['', 'ปีงบประมาณ'].concat(ps.map(p => p.fy)), ['', 'ลำดับโครงการ'].concat(ps.map(p => p.seq)), ['', 'เลขที่สัญญา'].concat(ps.map(p => p.contract)), ['', 'โปรแกรม'].concat(ps.map(p => p.program))];
+  rows.push(['ลำดับ','ผลผลิต (Output) ได้/เป้า'].concat(ps.map(() => '')));
+  OUTPUTS.forEach(o => { rows.push([o.no, o.name].concat(ps.map(p => got(p.id,'out',o.id).ok + '/' + target(p,'out',o.id))));
+    if(o.id === 'O1') O1_SUBS.forEach(s => rows.push(['', s.name].concat(ps.map(p => got(p.id,'out','O1',s.id).ok + '/' + target(p,'out','O1',s.id))))); });
+  rows.push(['','ผลลัพธ์ (Outcome) ได้/เป้า'].concat(ps.map(() => '')));
+  OUTCOMES.forEach(o => rows.push([o.no, o.name].concat(ps.map(p => got(p.id,'oc',o.id).ok + '/' + target(p,'oc',o.id)))));
+  download('สรุปผลผลิต_ผลลัพธ์_' + (UI.fy === 'all' ? 'ทุกปี' : UI.fy) + '.csv', csv(rows), 'text/csv;charset=utf-8');
+}
+
+/* ---------- Excel import ---------- */
+function loadXLSX(){
+  if(window.XLSX) return Promise.resolve();
+  return new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = XLSX_URL; sc.onload = () => res(); sc.onerror = () => rej(new Error('load')); document.head.appendChild(sc); });
+}
+const normT = v => v == null ? '' : String(v).replace(/\s+/g, ' ').trim();
+function numX(v){ if(v == null) return 0; if(typeof v === 'number') return isFinite(v) ? v : 0; const t = String(v).replace(/,/g, '').trim(); if(!t || t === '-' || t.charAt(0) === '=') return 0; const n = parseFloat(t); return isNaN(n) ? 0 : n; }
+const PROG_ALIAS = {'British Council - ISPF Grant for International Research Collaboration':'British Council - ISPF'};
+function cleanProg(t){ t = normT(t).replace(/^\((.*)\)$/, '$1').trim(); return PROG_ALIAS[t] || t; }
+function closeParen(t){ t = normT(t); const o = (t.match(/\(/g) || []).length, c = (t.match(/\)/g) || []).length; return o > c ? t + ')'.repeat(o - c) : t; }
+function toFY(d){ d = +d; if(!d) return null; if(d < 100) return 2500 + d; if(d >= 2500 && d < 2600) return d; if(d > 1950 && d < 2100) return d + 543; return null; }
+function detectFY(sheet, contracts, fname){
+  const m = String(sheet).match(/(\d{2,4})(?!.*\d)/); let y = m ? toFY(m[1]) : null;
+  if(!y){ const c = contracts.map(x => (String(x).match(/^[A-Z]\d{2}[A-Z](\d{2})/) || [])[1]).filter(Boolean); if(c.length) y = toFY(c[0]); }
+  if(!y){ const f = String(fname).match(/(25\d{2})/) || String(fname).match(/_(\d{2})(?!\d)/); if(f) y = toFY(f[1]); }
+  return y;
+}
+function parseSheet(ws, sheetName, fname){
+  const A = XLSX.utils.sheet_to_json(ws, {header:1, defval:null, raw:true, blankrows:true});
+  const B = r => normT((A[r] || [])[1]);
+  const row = r => r < 0 ? [] : (A[r] || []);
+  const find = (test, from, to) => { for(let r = from || 0; r < (to == null ? A.length : to); r++) if(test(B(r))) return r; return -1; };
+  const rC = find(t => t.indexOf('เลขที่สัญญา') === 0); if(rC < 0) return null;
+  const rOut = find(t => t.indexOf('ผลผลิต') === 0), rOc = find(t => t.indexOf('ผลลัพธ์') === 0, rOut + 1);
+  const lim = rOut > 0 ? rOut : A.length; const f = t => find(t, 0, lim);
+  const R = {prog:f(t => t.indexOf('โปรแกรม') === 0), seq:f(t => t.indexOf('ลำดับโครงการ') === 0), th:f(t => t.indexOf('(TH)') >= 0), en:f(t => t.indexOf('(EN)') >= 0),
+    pi:f(t => t.indexOf('หัวหน้าโครงการ') === 0), inst:f(t => t === 'สถาบัน' || t === 'หน่วยงาน'), bud:f(t => t.indexOf('งบประมาณ') === 0),
+    gbp:f(t => t.indexOf('GBP') >= 0), jpy:f(t => t.indexOf('Yen') >= 0 || t.indexOf('JPY') >= 0), php:f(t => t.indexOf('PHP') >= 0),
+    thb:f(t => t.indexOf('THB') >= 0 && t.indexOf('Total') >= 0 && t.indexOf('+') < 0), yrs:f(t => t.indexOf('ระยะเวลา') === 0),
+    thi:f(t => t.indexOf('สถาบันไทย') === 0), priv:f(t => t === 'เอกชน'), fo:f(t => t.indexOf('สถาบันนอก') === 0)};
+  const warn = [];
+  const cols = []; row(rC).forEach((v, c) => { const t = normT(v); if(c >= 2 && t && t !== 'รวม' && t.charAt(0) !== '=') cols.push(c); });
+  if(!cols.length) return null;
+  // program names: merged cells first, then carry forward
+  const prog = {}; const pr = row(R.prog);
+  cols.forEach(c => { prog[c] = cleanProg(pr[c]); });
+  (ws['!merges'] || []).forEach(m => { if(m.s.r <= R.prog && m.e.r >= R.prog){ const v = cleanProg(pr[m.s.c]); for(let c = m.s.c; c <= m.e.c; c++) if(!prog[c]) prog[c] = v; } });
+  let last = ''; cols.forEach(c => { if(prog[c]) last = prog[c]; else prog[c] = last; });
+  // output / outcome rows
+  const outR = {}, ocR = {}, subR = {};
+  if(rOut < 0) warn.push('ไม่พบแถวหัวข้อ "ผลผลิต (Output)"');
+  else { let cur = 0; for(let r = rOut + 1; r < (rOc > 0 ? rOc : A.length); r++){ const a = parseInt(normT(row(r)[0]), 10), b = B(r);
+      if(a >= 1 && a <= 10){ outR[a] = r; cur = a; }
+      else if(cur === 1 && b){ if(b.indexOf('สูง') === 0) subR.h = r; else if(b.indexOf('กลาง') === 0) subR.m = r; else if(b.indexOf('ต่ำ') === 0) subR.l = r; } } }
+  if(rOc < 0) warn.push('ไม่พบแถวหัวข้อ "ผลลัพธ์ (Outcome)" เป้าหมาย Outcome จะเป็น 0');
+  else for(let r = rOc + 1; r < A.length; r++){ const a = parseInt(normT(row(r)[0]), 10); if(a >= 1 && a <= 14 && !ocR[a]) ocR[a] = r; }
+  const missO = OUTPUTS.filter(o => !outR[o.no]).map(o => o.no); if(rOut >= 0 && missO.length) warn.push('ไม่พบผลผลิตลำดับ ' + missO.join(', '));
+  const missC = OUTCOMES.filter(o => !ocR[o.no]).map(o => o.no); if(rOc >= 0 && missC.length) warn.push('ไม่พบผลลัพธ์ลำดับ ' + missC.join(', '));
+  const cell = (r, c) => r == null || r < 0 ? null : row(r)[c];
+  const projects = cols.map((c, i) => {
+    const out = {O1:{t:numX(cell(outR[1], c)), h:numX(cell(subR.h, c)), m:numX(cell(subR.m, c)), l:numX(cell(subR.l, c))}};
+    const subSum = out.O1.h + out.O1.m + out.O1.l;
+    if(!out.O1.t && subSum) out.O1.t = subSum;
+    for(let n = 2; n <= 10; n++) out['O' + n] = numX(cell(outR[n], c));
+    const oc = {}; for(let n = 1; n <= 14; n++) oc['C' + n] = numX(cell(ocR[n], c));
+    const contract = normT(cell(rC, c));
+    if(subSum && subSum !== out.O1.t) warn.push(contract + ': กำลังคน 3 ระดับรวมได้ ' + subSum + ' ไม่เท่ากับยอดรวม ' + out.O1.t);
+    return {contract, seq:numX(cell(R.seq, c)) || i + 1, th:normT(cell(R.th, c)), en:normT(cell(R.en, c)), pi:normT(cell(R.pi, c)), inst:closeParen(cell(R.inst, c)),
+      program:prog[c] || 'ไม่ระบุโปรแกรม', budget:numX(cell(R.bud, c)), inGBP:numX(cell(R.gbp, c)), inJPY:numX(cell(R.jpy, c)), inPHP:numX(cell(R.php, c)),
+      inTHB:Math.round(numX(cell(R.thb, c)) * 100) / 100, years:numX(cell(R.yrs, c)), thInst:numX(cell(R.thi, c)), priv:numX(cell(R.priv, c)), foreign:numX(cell(R.fo, c)), out, oc};
+  });
+  projects.filter(p => !p.th).forEach(p => warn.push(p.contract + ': ไม่มีชื่อโครงการภาษาไทย'));
+  const seen = {}; projects.forEach(p => { if(seen[p.contract]) warn.push('เลขที่สัญญา ' + p.contract + ' ซ้ำในชีตเดียวกัน'); seen[p.contract] = 1; });
+  return {name:sheetName, fy:detectFY(sheetName, projects.map(p => p.contract), fname), projects, warn, checked:true};
+}
+let IMPORT = null;
+function importForm(){
+  const I = IMPORT; const yrOpts = y => { let o = '<option value="">เลือกปี</option>'; for(let v = 2560; v <= 2575; v++) o += '<option' + (v === y ? ' selected' : '') + '>' + v + '</option>'; return o; };
+  const total = I.sheets.filter(x => x.checked && x.fy).reduce((a, x) => a + x.projects.length, 0);
+  let h = '<div class="dialog-h"><div><h2>นำเข้าเป้าหมายจาก Excel</h2><p>' + esc(I.file) + ' พบ ' + I.sheets.length + ' ชีตที่มีข้อมูลโครงการ ตรวจปีงบประมาณของแต่ละชีตก่อนนำเข้า</p></div><button class="x" type="button" data-act="close" aria-label="ปิด">×</button></div><div class="dialog-b"><div class="full" style="overflow-x:auto">';
+  h += '<table class="imp-t"><thead><tr><th></th><th>ชีต</th><th>ปีงบประมาณ</th><th>โครงการ</th><th>ผลการนำเข้า</th></tr></thead><tbody>';
+  I.sheets.forEach((x, i) => {
+    const nNew = x.projects.filter(p => !P(p.contract)).length, nUpd = x.projects.length - nNew;
+    const other = x.projects.filter(p => P(p.contract) && x.fy && P(p.contract).fy !== x.fy).length;
+    h += '<tr><td><input type="checkbox" data-impchk="' + i + '"' + (x.checked ? ' checked' : '') + ' aria-label="นำเข้าชีต ' + esc(x.name) + '"></td><td><b>' + esc(x.name) + '</b></td><td><select data-impfy="' + i + '" aria-label="ปีงบประมาณของชีต ' + esc(x.name) + '">' + yrOpts(x.fy) + '</select></td><td>' + x.projects.length + ' โครงการ<div class="small muted">' + esc(Array.from(new Set(x.projects.map(p => p.program))).join(', ')) + '</div></td>' +
+      '<td>' + (nNew ? 'เพิ่มใหม่ ' + nNew : '') + (nNew && nUpd ? ', ' : '') + (nUpd ? 'อัปเดตเป้าหมาย ' + nUpd : '') + (other ? '<div class="small" style="color:var(--risk)">' + other + ' โครงการเดิมอยู่ปีอื่น จะย้ายมาปีนี้</div>' : '') + '</td></tr>';
+    if(x.warn.length) h += '<tr><td></td><td colspan="4"><ul class="warn">' + x.warn.slice(0, 8).map(w => '<li>' + esc(w) + '</li>').join('') + (x.warn.length > 8 ? '<li>และอีก ' + (x.warn.length - 8) + ' ข้อ</li>' : '') + '</ul></td></tr>';
+  });
+  h += '</tbody></table></div><p class="full small muted" style="margin:0">โครงการที่มีเลขที่สัญญาอยู่แล้ว ระบบจะอัปเดตข้อมูลและเป้าหมายตามไฟล์ บันทึกประวัติการเปลี่ยนเป้าหมาย และเก็บผลงานกับวันที่สัญญาที่บันทึกไว้เดิม' + (MODE === 'demo' ? ' ขณะนี้อยู่ในโหมดข้อมูลตัวอย่าง ข้อมูลที่นำเข้าจะอยู่ในชุดตัวอย่างเท่านั้น' : '') + '</p></div>';
+  h += '<div class="dialog-f"><div class="r"><button class="btn" type="button" data-act="close">ยกเลิก</button><button class="btn pri" type="button" data-act="import-apply"' + (total ? '' : ' disabled') + '>นำเข้า ' + total + ' โครงการ</button></div></div>';
+  return h;
+}
+function targetDiff(p, out, oc){
+  const d = [];
+  O1_SUBS.forEach(sb => { if((+p.targets.O1[sb.id]||0) !== (+out.O1[sb.id]||0)) d.push('ผลผลิต 1 ' + sb.short + ' ' + (p.targets.O1[sb.id]||0) + ' เป็น ' + (out.O1[sb.id]||0)); });
+  OUTPUTS.slice(1).forEach(o => { if((+p.targets[o.id]||0) !== (+out[o.id]||0)) d.push('ผลผลิต ' + o.no + ' ' + (p.targets[o.id]||0) + ' เป็น ' + (out[o.id]||0)); });
+  OUTCOMES.forEach(o => { if((+p.ocTargets[o.id]||0) !== (+oc[o.id]||0)) d.push('ผลลัพธ์ ' + o.no + ' ' + (p.ocTargets[o.id]||0) + ' เป็น ' + (oc[o.id]||0)); });
+  return d;
+}
+function applyImport(){
+  let added = 0, updated = 0; const fys = new Set();
+  IMPORT.sheets.filter(x => x.checked && x.fy).forEach(x => x.projects.forEach(np => {
+    const info = {fy:x.fy, seq:np.seq, contract:np.contract, th:np.th, en:np.en, pi:np.pi, inst:np.inst, program:np.program, budget:np.budget,
+      inGBP:np.inGBP, inJPY:np.inJPY, inPHP:np.inPHP, inTHB:np.inTHB, years:np.years, thInst:np.thInst, priv:np.priv, foreign:np.foreign};
+    const ex = P(np.contract);
+    if(ex){ const d = targetDiff(ex, np.out, np.oc);
+      if(d.length){ ex.targetLog = ex.targetLog || []; ex.targetLog.push({at:new Date().toISOString(), by:S.analyst, reason:'นำเข้าจากไฟล์ ' + IMPORT.file + ' ชีต ' + x.name, diff:d.join(', ')}); }
+      Object.assign(ex, info, {targets:np.out, ocTargets:np.oc}); updated++; }
+    else { S.projects.push(Object.assign(info, {id:np.contract, start:'', end:'', note:'', targets:np.out, ocTargets:np.oc, targetLog:[]})); added++; }
+    fys.add(x.fy);
+  }));
+  S.projects.sort((a, b) => a.fy - b.fy || a.seq - b.seq);
+  save(); closeModal();
+  UI.fy = fys.size === 1 ? Array.from(fys)[0] : 'all'; UI.prog = 'all'; fixPid(); saveUI(); go('overview');
+  toast('นำเข้าแล้ว: เพิ่มใหม่ ' + added + ' อัปเดต ' + updated + ' โครงการ');
+}
+async function handleXlsx(file){
+  try { toast('กำลังอ่านไฟล์ ' + file.name); await loadXLSX(); }
+  catch(e){ toast('โหลดตัวอ่าน Excel ไม่ได้ ตรวจการเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่'); return; }
+  try {
+    const wb = XLSX.read(await file.arrayBuffer(), {type:'array'});
+    const sheets = wb.SheetNames.map(n => parseSheet(wb.Sheets[n], n, file.name)).filter(Boolean);
+    if(!sheets.length){ toast('ไม่พบชีตที่มีแถว "เลขที่สัญญาโครงการ" ในคอลัมน์ B ใช้แบบฟอร์มเดียวกับชีต Output_68'); return; }
+    IMPORT = {file:file.name, sheets}; openModal(importForm());
+  } catch(e){ toast('อ่านไฟล์ไม่ได้ ไฟล์ต้องเป็น .xlsx'); }
+}
+async function templateXlsx(){
+  try { await loadXLSX(); } catch(e){ toast('โหลดตัวสร้างไฟล์ Excel ไม่ได้ ตรวจการเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่'); return; }
+  const fy = UI.fy === 'all' ? years().find(y => !S.projects.some(p => p.fy === y)) || YEAR_RANGE[YEAR_RANGE.length - 1] : UI.fy;
+  const N = 20, blank = () => new Array(N).fill(null);
+  const aoa = [[null, 'โปรแกรม'].concat(blank()), [null, 'ลำดับโครงการ'].concat(Array.from({length:N}, (_, i) => i + 1))];
+  ['เลขที่สัญญาโครงการ','โครงการ (TH)','โครงการ (EN)','หัวหน้าโครงการ','สถาบัน','งบประมาณ (บาท) ฝั่งไทย','In-cash (GBP)','In-cash (Yen)','In-cash (PHP)','Total (In-cash, THB)','ระยะเวลา (ปี)','สถาบันไทย (หัวหน้า+ที่อื่น)','เอกชน','สถาบันนอก(ตปท.)']
+    .forEach(l => aoa.push([null, l].concat(blank())));
+  aoa.push(['ลำดับ', 'ผลผลิต (Output)'].concat(blank()));
+  OUTPUTS.forEach(o => { aoa.push([o.no, o.name].concat(blank())); if(o.id === 'O1') O1_SUBS.forEach(sb => aoa.push([null, sb.name].concat(blank()))); });
+  aoa.push([null, 'ผลลัพธ์ (Outcome)'].concat(blank()));
+  OUTCOMES.forEach(o => aoa.push([o.no, o.name].concat(blank())));
+  const ws = XLSX.utils.aoa_to_sheet(aoa); ws['!cols'] = [{wch:6}, {wch:44}].concat(blank().map(() => ({wch:16})));
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Output_' + String(fy).slice(-2));
+  XLSX.writeFile(wb, 'แบบฟอร์มเป้าหมาย_Output_' + String(fy).slice(-2) + '.xlsx');
+  toast('ดาวน์โหลดแบบฟอร์มปี ' + fy + ' แล้ว กรอกแล้วนำเข้าได้เลย');
+}
+
+/* ---------- add / edit project ---------- */
+function projectForm(p){
+  const isNew = !p;
+  const v = p || {fy: UI.fy === 'all' ? Math.max.apply(null, years()) : UI.fy, program:'', contract:'', th:'', en:'', pi:'', inst:'', budget:'', years:''};
+  const allProg = Array.from(new Set(S.projects.map(x => x.program)));
+  let yo = ''; for(let y = 2560; y <= 2575; y++) yo += '<option' + (y === v.fy ? ' selected' : '') + '>' + y + '</option>';
+  return '<div class="dialog-h"><div><h2>' + (isNew ? 'เพิ่มโครงการ' : 'แก้ไขข้อมูลโครงการ') + '</h2><p>' + (isNew ? 'หลังบันทึก ระบบจะเปิดหน้ากรอกเป้าหมาย Output/Outcome ต่อ' : esc(v.contract)) + '</p></div><button class="x" type="button" data-act="close" aria-label="ปิด">×</button></div><form id="pf" class="dialog-b">' +
+    '<label class="f">ปีงบประมาณ<select name="fy">' + yo + '</select></label>' +
+    '<label class="f">เลขที่สัญญาโครงการ<input type="text" name="contract" value="' + esc(v.contract) + '"' + (isNew ? ' placeholder="เช่น B49G690101"' : ' readonly') + '>' + (isNew ? '' : '<span class="hint">เลขที่สัญญาใช้เป็นรหัสโครงการ แก้ไขไม่ได้</span>') + '</label>' +
+    '<label class="f">โปรแกรม<input type="text" name="program" list="proglist" value="' + esc(v.program) + '" placeholder="เช่น JST, e-ASIA JRP"><datalist id="proglist">' + allProg.map(x => '<option value="' + esc(x) + '">').join('') + '</datalist></label>' +
+    '<label class="f">ระยะเวลา (ปี)<input type="number" name="years" min="0" step="1" value="' + esc(v.years) + '"></label>' +
+    '<label class="f full">ชื่อโครงการ (TH)<textarea name="th" rows="2">' + esc(v.th) + '</textarea></label>' +
+    '<label class="f full">ชื่อโครงการ (EN)<textarea name="en" rows="2">' + esc(v.en) + '</textarea></label>' +
+    '<label class="f">หัวหน้าโครงการ<input type="text" name="pi" value="' + esc(v.pi) + '"></label>' +
+    '<label class="f">สถาบัน<input type="text" name="inst" value="' + esc(v.inst) + '"></label>' +
+    '<label class="f">งบประมาณฝั่งไทย (บาท)<input type="number" name="budget" min="0" value="' + esc(v.budget) + '"></label></form>' +
+    '<div class="dialog-f">' + (isNew ? '' : '<button class="btn danger" type="button" data-act="project-del">ลบโครงการ</button>') + '<div class="r"><button class="btn" type="button" data-act="close">ยกเลิก</button><button class="btn pri" type="button" data-act="project-save" data-new="' + (isNew ? 1 : 0) + '">' + (isNew ? 'เพิ่มโครงการและกรอกเป้าหมาย' : 'บันทึกข้อมูลโครงการ') + '</button></div></div>';
+}
+function emptyTargets(){ const t = {O1:{t:0, h:0, m:0, l:0}}; OUTPUTS.slice(1).forEach(o => t[o.id] = 0); const c = {}; OUTCOMES.forEach(o => c[o.id] = 0); return [t, c]; }
+
+/* ---------- toast ---------- */
+let tT = null;
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(tT); tT = setTimeout(() => t.classList.remove('show'), 2600); }
+
+/* ---------- events ---------- */
+document.addEventListener('click', ev => {
+  const el = ev.target.closest('[data-fy],[data-more],[data-go],[data-open],[data-ovkind],[data-prog],[data-filter-item],[data-nav-p],[data-ptab],[data-add],[data-edit],[data-confirm],[data-act],[data-inkind]');
+  if(!el) { if(ev.target === $('#modal')) closeModal(); return; }
+  const d = el.dataset;
+  if(d.fy){ UI.fy = d.fy === 'all' ? 'all' : +d.fy; UI.prog = 'all'; UI.hi = null; if(d.go) UI.view = d.go; fixPid(); if(UI.intake.pid && !scope().some(p => p.id === UI.intake.pid)) UI.intake.pid = ''; if(UI.reg.pid && !scope().some(p => p.id === UI.reg.pid)) UI.reg.pid = ''; saveUI(); return render(); }
+  if(d.more){ UI.openEv = UI.openEv || {}; const k = UI.pid + d.more; UI.openEv[k] = !UI.openEv[k]; const y = scrollY; render(); scrollTo(0, y); return; }
+  if(d.go){ fixPid(); return go(d.go); }
+  if(d.ovkind){ UI.ovKind = d.ovkind; UI.hi = null; return render(); }
+  if(d.prog){ UI.prog = d.prog; return render(); }
+  if(d.filterItem){ UI.hi = UI.hi === d.filterItem ? null : d.filterItem; render(); const th = document.querySelector('.mx th.hi'); if(th) th.scrollIntoView({block:'nearest', inline:'center', behavior:'smooth'}); return; }
+  if(d.open){ ev.stopPropagation(); return openProject(d.open, d.item); }
+  if(d.navP){ const PS = scope(); const i = PS.findIndex(p => p.id === UI.pid) + (+d.navP); if(PS[i]) { UI.pid = PS[i].id; render(); } return; }
+  if(d.ptab){ UI.ptab = d.ptab; return render(); }
+  if(d.inkind){ UI.intake.kind = d.inkind; return render(); }
+  if(d.add) return openEntry(UI.pid, UI.ptab, d.add);
+  if(d.edit){ const e = S.entries.find(x => x.id === d.edit); if(e) openEntry(e.pid, e.kind, e.item, e); return; }
+  if(d.confirm){ const e = S.entries.find(x => x.id === d.confirm); if(e){ e.status = 'ok'; save(); render(); toast('ยืนยันผลงานแล้ว'); } return; }
+  const a = d.act;
+  if(a === 'close') return closeModal();
+  if(a === 'mode-real') return setMode('real');
+  if(a === 'mode-demo') return setMode('demo');
+  if(a === 'demo-regen'){ S = demoState(); save(); render(); return toast('สุ่มข้อมูลตัวอย่างใหม่แล้ว'); }
+  if(a === 'entry-save'){
+    const e = readEntryForm(); const isNew = !e.id;
+    if(isNew){ e.id = uid(); e.by = S.analyst; e.at = new Date().toISOString(); S.entries.push(e); }
+    else { const i = S.entries.findIndex(x => x.id === e.id); S.entries[i] = Object.assign(S.entries[i], e, {by:S.analyst, at:new Date().toISOString()}); }
+    save(); closeModal(); render(); return toast(isNew ? 'บันทึกผลงานแล้ว' : 'บันทึกการแก้ไขแล้ว');
+  }
+  if(a === 'entry-del'){ if(!EDIT || !EDIT.id) return; const btn = el; if(btn.dataset.armed !== '1'){ btn.dataset.armed = '1'; btn.textContent = 'กดอีกครั้งเพื่อยืนยันการลบ'; return; }
+    S.entries = S.entries.filter(x => x.id !== EDIT.id); save(); closeModal(); render(); return toast('ลบผลงานแล้ว'); }
+  if(a === 'edit-targets') return openModal(targetsForm(P(UI.pid)));
+  if(a === 'edit-contract') return openModal(contractForm(P(UI.pid)));
+  if(a === 'targets-save'){
+    const p = P(UI.pid), fd = new FormData($('#tf')); const diff = [];
+    const setN = (obj, k, v, label) => { v = Math.max(0, parseInt(v, 10) || 0); if((+obj[k]||0) !== v){ diff.push(label + ' ' + (obj[k]||0) + ' เป็น ' + v); obj[k] = v; } };
+    O1_SUBS.forEach(s => setN(p.targets.O1, s.id, fd.get('O1_' + s.id), 'ผลผลิต 1 ' + s.short));
+    p.targets.O1.t = O1_SUBS.reduce((x, s) => x + (+p.targets.O1[s.id]||0), 0);
+    OUTPUTS.slice(1).forEach(o => setN(p.targets, o.id, fd.get(o.id), 'ผลผลิต ' + o.no));
+    OUTCOMES.forEach(o => setN(p.ocTargets, o.id, fd.get(o.id), 'ผลลัพธ์ ' + o.no));
+    if(diff.length){ p.targetLog = p.targetLog || []; p.targetLog.push({at:new Date().toISOString(), by:S.analyst, reason:(fd.get('reason')||'').trim(), diff:diff.join(', ')}); save(); }
+    closeModal(); render(); return toast(diff.length ? 'บันทึกเป้าหมายแล้ว ' + diff.length + ' รายการ' : 'ไม่มีเป้าหมายที่เปลี่ยน');
+  }
+  if(a === 'contract-save'){
+    const p = P(UI.pid), fd = new FormData($('#cf')); p.start = fd.get('start') || ''; p.end = fd.get('end') || ''; p.note = (fd.get('note')||'').trim();
+    if(p.start && !p.end && p.years){ const e = parseD(p.start); e.setFullYear(e.getFullYear() + p.years); e.setDate(e.getDate() - 1); p.end = isoD(e); }
+    save(); closeModal(); render(); return toast('บันทึกวันที่แล้ว');
+  }
+  if(a === 'intake-this'){ UI.intake.pid = UI.pid; UI.intake.kind = UI.ptab; return go('intake'); }
+  if(a === 'intake-save') return intakeSave();
+  if(a === 'intake-clear'){ document.querySelectorAll('[data-q],[data-d]').forEach(i => i.value = ''); return intakeSum(); }
+  if(a === 'confirm-all'){
+    const R = UI.reg, q = R.q.trim().toLowerCase(); let n = 0; const ids = new Set(scope().map(p => p.id));
+    S.entries.forEach(e => { if(e.status === 'ok' || !ids.has(e.pid)) return; if(R.pid && e.pid !== R.pid) return; if(R.item && e.kind + ':' + e.item !== R.item) return; if(R.round && e.round !== R.round) return;
+      if(q && !((e.title||'') + ' ' + (e.note||'') + ' ' + JSON.stringify(e.f||{}) + ' ' + (P(e.pid)||{}).contract).toLowerCase().includes(q)) return; e.status = 'ok'; n++; });
+    save(); render(); return toast('ยืนยันแล้ว ' + n + ' รายการ');
+  }
+  if(a === 'import-xlsx') return $('#impx').click();
+  if(a === 'template-xlsx') return templateXlsx();
+  if(a === 'import-apply') return applyImport();
+  if(a === 'add-project') return openModal(projectForm(null));
+  if(a === 'edit-project') return openModal(projectForm(P(UI.pid)));
+  if(a === 'project-save'){
+    const fd = new FormData($('#pf')); const isNew = el.dataset.new === '1';
+    const contract = (fd.get('contract') || '').trim(), th = (fd.get('th') || '').trim();
+    if(!contract){ toast('กรอกเลขที่สัญญาโครงการ'); return; }
+    if(!th){ toast('กรอกชื่อโครงการภาษาไทย'); return; }
+    if(isNew && P(contract)){ toast('มีเลขที่สัญญา ' + contract + ' ในระบบแล้ว'); return; }
+    const fy = +fd.get('fy');
+    const info = {fy, program:(fd.get('program') || '').trim() || 'ไม่ระบุโปรแกรม', th, en:(fd.get('en') || '').trim(), pi:(fd.get('pi') || '').trim(), inst:(fd.get('inst') || '').trim(), budget:+fd.get('budget') || 0, years:+fd.get('years') || 0};
+    if(isNew){ const tg = emptyTargets(); const seq = S.projects.filter(p => p.fy === fy).reduce((m, p) => Math.max(m, p.seq || 0), 0) + 1;
+      S.projects.push(Object.assign(info, {id:contract, contract, seq, inGBP:0, inJPY:0, inPHP:0, inTHB:0, thInst:0, priv:0, foreign:0, start:'', end:'', note:'', targets:tg[0], ocTargets:tg[1], targetLog:[]}));
+      S.projects.sort((a, b) => a.fy - b.fy || a.seq - b.seq); }
+    else Object.assign(P(UI.pid), info);
+    save(); closeModal(); UI.fy = fy; UI.pid = isNew ? contract : UI.pid; UI.view = 'project'; saveUI(); render();
+    if(isNew){ openModal(targetsForm(P(contract))); toast('เพิ่มโครงการแล้ว กรอกเป้าหมายต่อ'); } else toast('บันทึกข้อมูลโครงการแล้ว');
+    return;
+  }
+  if(a === 'project-del'){ if(el.dataset.armed !== '1'){ el.dataset.armed = '1'; el.textContent = 'กดอีกครั้ง ผลงานของโครงการนี้จะถูกลบด้วย'; return; }
+    const id = UI.pid; S.projects = S.projects.filter(p => p.id !== id); S.entries = S.entries.filter(e => e.pid !== id); save(); closeModal(); fixPid(); render(); return toast('ลบโครงการแล้ว'); }
+  if(a === 'del-year'){ const y = +el.dataset.year; if(el.dataset.armed !== '1'){ el.dataset.armed = '1'; el.textContent = 'กดอีกครั้งเพื่อลบปี ' + y; return; }
+    const ids = new Set(S.projects.filter(p => p.fy === y).map(p => p.id)); S.projects = S.projects.filter(p => p.fy !== y); S.entries = S.entries.filter(e => !ids.has(e.pid));
+    save(); if(UI.fy === y) UI.fy = 'all'; fixPid(); render(); return toast('ลบข้อมูลปี ' + y + ' แล้ว ' + ids.size + ' โครงการ'); }
+  if(a === 'csv-entries') return csvEntries();
+  if(a === 'csv-matrix') return csvMatrix();
+  if(a === 'export-json') return download('d3-kr-tracker_' + (MODE === 'demo' ? 'demo_' : '') + isoD(new Date()) + '.json', JSON.stringify(S, null, 1), 'application/json');
+  if(a === 'import-json') return $('#imp').click();
+  if(a === 'save-kr'){ OUTPUTS.forEach(o => { const c = document.querySelector('[data-krc="' + o.id + '"]').value.trim(), t = document.querySelector('[data-krt="' + o.id + '"]').value.trim(); if(c || t) S.kr[o.id] = {code:c, text:t}; else delete S.kr[o.id]; }); save(); render(); return toast('บันทึกการเชื่อม KR แล้ว'); }
+  if(a === 'reset'){ if(el.dataset.armed !== '1'){ el.dataset.armed = '1'; el.textContent = 'กดอีกครั้งเพื่อยืนยันการล้างข้อมูล'; return; }
+    const an = S.analyst; S = MODE === 'demo' ? demoState() : baseState(); S.analyst = an; save(); render(); return toast('โหลดเป้าหมายจากไฟล์ใหม่แล้ว'); }
+});
+document.addEventListener('input', ev => {
+  const t = ev.target;
+  if(t.id === 'ovq'){ UI.q = t.value; const pos = t.selectionStart; render(); const n = $('#ovq'); n.focus(); n.setSelectionRange(pos, pos); }
+  else if(t.id === 'rg-q'){ UI.reg.q = t.value; const pos = t.selectionStart; render(); const n = $('#rg-q'); n.focus(); n.setSelectionRange(pos, pos); }
+  else if(t.matches('[data-q],[data-d]')) intakeSum();
+  else if(t.matches('textarea[data-d]')) {}
+  if(t.matches('#tf input[name^="O1_"]')){ const f = $('#tf'); const s = ['h','m','l'].reduce((a,k) => a + (parseInt(f.elements['O1_' + k].value,10)||0), 0); $('#o1sum').textContent = s; }
+});
+document.addEventListener('change', ev => {
+  const t = ev.target;
+  if(t.id === 'ovsort'){ UI.sort = t.value; render(); }
+  else if(t.id === 'pselect'){ UI.pid = t.value; render(); }
+  else if(t.id === 'in-pid'){ UI.intake.pid = t.value; UI.intake.round = $('#in-round').value; UI.intake.date = $('#in-date').value; UI.intake.doc = $('#in-doc').value; render(); }
+  else if(t.id === 'in-all'){ UI.intake.all = t.checked; UI.intake.round = $('#in-round').value; UI.intake.date = $('#in-date').value; UI.intake.doc = $('#in-doc').value; render(); }
+  else if(t.id === 'in-round'){ UI.intake.round = t.value; }
+  else if(t.id === 'in-date'){ UI.intake.date = t.value; }
+  else if(t.id === 'rg-pid'){ UI.reg.pid = t.value; render(); }
+  else if(t.id === 'rg-item'){ UI.reg.item = t.value; render(); }
+  else if(t.id === 'rg-status'){ UI.reg.status = t.value; render(); }
+  else if(t.id === 'rg-round'){ UI.reg.round = t.value; render(); }
+  else if(t.id === 'set-analyst'){ S.analyst = t.value.trim() || 'ต้นน้ำ'; save(); toast('บันทึกชื่อผู้บันทึกแล้ว'); }
+  else if(t.id === 'ef-item'){ readEntryForm(); EDIT.item = t.value; EDIT.sub = EDIT.item === 'O1' ? (EDIT.sub || 'l') : null; EDIT.f = {}; $('#dialog').innerHTML = entryForm(EDIT); $('#ef-item').focus(); }
+  else if(t.id === 'impx'){ const file = t.files[0]; t.value = ''; if(file) handleXlsx(file); }
+  else if(t.dataset.impchk != null){ IMPORT.sheets[+t.dataset.impchk].checked = t.checked; $('#dialog').innerHTML = importForm(); }
+  else if(t.dataset.impfy != null){ IMPORT.sheets[+t.dataset.impfy].fy = +t.value || null; $('#dialog').innerHTML = importForm(); }
+  else if(t.id === 'imp'){
+    const file = t.files[0]; if(!file) return; const rd = new FileReader();
+    rd.onload = () => { try { const d = JSON.parse(rd.result); if(!d.projects || !Array.isArray(d.entries)) throw new Error('bad'); S = d; S.projects.forEach(p => { if(!p.fy) p.fy = S.fy || SEED.fy; }); fixPid(); save(); render(); toast('นำเข้าข้อมูลแล้ว ' + d.entries.length + ' ผลงาน'); }
+      catch(e){ toast('นำเข้าไม่ได้ ไฟล์ต้องเป็น JSON ที่ส่งออกจากระบบนี้'); } t.value = ''; };
+    rd.readAsText(file);
+  }
+});
+document.addEventListener('keydown', ev => {
+  if(ev.key === 'Escape' && $('#modal').classList.contains('open')) closeModal();
+  if((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches('tr.pr')){ ev.preventDefault(); openProject(ev.target.dataset.open); }
+});
+function toggleTheme(){
+  const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  document.documentElement.dataset.theme = cur === 'dark' ? 'light' : 'dark'; saveUI();
+}
+$('#themeBtn').addEventListener('click', toggleTheme);
+$('#themeBtnM').addEventListener('click', toggleTheme);
+$('#ver').textContent = APP_VER;
+
+load(); render();
+</script>
+</body>
+</html>
